@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "async-stripe"
-version = "0.2.0"
+version = "0.2.0-beta5"
 description = "An asynchronous wrapper around the official stripe library."
 authors = [
     "Bharat Chauhan <tell.bhch@gmail.com>", 

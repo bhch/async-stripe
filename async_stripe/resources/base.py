@@ -5,7 +5,7 @@ from stripe.api_requestor import _api_encode
 from async_stripe.patched_stripe import real_stripe
 
 
-BASE_URL = 'https://api.stripe.com/v1/'
+BASE_URL = 'https://api.stripe.com/v1/' # :TODO: Construct urls from real_stripe
 
 
 client = AsyncHTTPClient()
@@ -25,6 +25,10 @@ class AsyncBaseResource(metaclass=ResourceMetaclass):
         else:
             body = None
 
+        if method == 'GET' and body:
+            url = '%s?%s' % (url, body)
+            body = None # reset body for GET request
+
         try:
             response = await client.fetch(
                 url,
@@ -33,33 +37,47 @@ class AsyncBaseResource(metaclass=ResourceMetaclass):
                 body=body
             )
         except HTTPError as e:
-            # :TODO: log exception
+            # :TODO: Raise stipe's exceptions
             if hasattr(e, 'response'):
                 print('ERROR:', e.code)
                 print(e.response.body)
             raise
         except Exception as e:
-            # :TODO: log exception
+            # :TODO: Raise stipe's exceptions
             raise
         else:
-            obj = real_stripe.util.convert_to_stripe_object(json.loads(response.body), real_stripe.api_key)
-            return obj
+            stripe_obj = real_stripe.util.convert_to_stripe_object(
+                json.loads(response.body), real_stripe.api_key
+            )
+            return stripe_obj
 
     @classmethod
     async def retrieve(cls, id):
         url = cls.url + '/' + id
-        obj = await cls.fetch(url)
-        return obj
+        stripe_obj = await cls.fetch(url)
+        return stripe_obj
 
     @classmethod
     async def create(cls, **kwargs):
         url = cls.url
-        obj = await cls.fetch(url, method='POST', data=kwargs)
-        return obj
+        stripe_obj = await cls.fetch(url, method='POST', data=kwargs)
+        return stripe_obj
 
     @classmethod
     async def modify(cls, id, **kwargs):
         url = cls.url + '/' + id
-        obj = await cls.fetch(url, method='POST', data=kwargs)
-        return obj
+        stripe_obj = await cls.fetch(url, method='POST', data=kwargs)
+        return stripe_obj
+
+    @classmethod
+    async def delete(cls, id):
+        url = cls.url + '/' + id
+        stripe_obj = await cls.fetch(url, method='DELETE')
+        return stripe_obj
+
+    @classmethod
+    async def list(cls, **kwargs):
+        url = cls.url
+        stripe_obj = await cls.fetch(url, data=kwargs)
+        return stripe_obj
 

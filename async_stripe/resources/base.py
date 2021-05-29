@@ -19,11 +19,33 @@ class ResourceMetaclass(type):
 
 class AsyncBaseResource(metaclass=ResourceMetaclass):
     @classmethod
-    async def fetch(cls, url, method='GET', data=None):
+    def get_headers(cls, data):
+        """Generates headers for the request.
+        Returns a tuple of two:
+            - a dict of headers
+            - and the data without the header keys.
+        """
         headers = {}
 
         if 'idempotency_key' in data:
             headers['idempotency_key'] = data.pop('idempotency_key') 
+
+        if 'stripe_account' in data:
+            headers['Stripe-Account'] = data.pop('stripe_account')
+
+        if real_stripe.api_version:
+            headers['Stripe-Version'] = real_stripe.api_version
+
+        # override stripe version from passed arguments
+        if 'stripe_version' in data:
+            headers['Stripe-Version'] = data.pop('stripe_version')
+
+        return headers, data
+
+
+    @classmethod
+    async def fetch(cls, url, method='GET', data=None):
+        headers, data = cls.get_headers(data)
 
         if data:
             body = urlencode(list(_api_encode(data)), doseq=True)

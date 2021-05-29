@@ -28,7 +28,7 @@ class AsyncBaseResource(metaclass=ResourceMetaclass):
         headers = {}
 
         if 'idempotency_key' in data:
-            headers['idempotency_key'] = data.pop('idempotency_key') 
+            headers['Idempotency-Key'] = data.pop('idempotency_key') 
 
         if 'stripe_account' in data:
             headers['Stripe-Account'] = data.pop('stripe_account')

@@ -20,6 +20,11 @@ class ResourceMetaclass(type):
 class AsyncBaseResource(metaclass=ResourceMetaclass):
     @classmethod
     async def fetch(cls, url, method='GET', data=None):
+        headers = {}
+
+        if 'idempotency_key' in data:
+            headers['idempotency_key'] = data.pop('idempotency_key') 
+
         if data:
             body = urlencode(list(_api_encode(data)), doseq=True)
         else:
@@ -34,6 +39,7 @@ class AsyncBaseResource(metaclass=ResourceMetaclass):
                 url,
                 method=method,
                 auth_username=real_stripe.api_key,
+                headers=headers,
                 body=body
             )
         except HTTPError as e:

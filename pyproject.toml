@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "async-stripe"
+version = "0.1.0"
+description = "An asynchronous wrapper around the official stripe library."
+authors = ["Bharat Chauhan, Christian Glacet"]
+license = "BSD 3-Clause"
+packages = [
+    {include = "async_stripe"},
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+stripe = "^2.57.0"
+
+[tool.poetry.dev-dependencies]
+bandit = "^1.7.0"
+mypy = "^0.812"
+flake8 = "^3.9.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

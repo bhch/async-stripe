@@ -6,7 +6,7 @@ from async_stripe.patched_stripe import real_stripe
 
 
 VERSION = "v1"
-BASE_URL = f"{real_stripe.api_base}/{VERSION}/"
+BASE_URL = "{}/{}/".format(real_stripe.api_base, VERSION)
 
 client = AsyncHTTPClient()
 

@@ -5,8 +5,8 @@ from stripe.api_requestor import _api_encode
 from async_stripe.patched_stripe import real_stripe
 
 
-BASE_URL = f"{real_stripe.api_base}/{real_stripe.api_version}/"
-
+VERSION = "v1"
+BASE_URL = f"{real_stripe.api_base}/{VERSION}/"
 
 client = AsyncHTTPClient()
 

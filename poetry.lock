@@ -270,7 +270,7 @@ testing = ["pathlib2", "unittest2", "jaraco.itertools", "func-timeout"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.5"
-content-hash = "b298b1345b9bcd239a8ad90718578319e09a28aad0f4e570681b6b3ae0abf713"
+content-hash = "6f080d7c5937dcb4bafb5bc6f6613cd7af21d3a74aac718f56527685192d890c"
 
 [metadata.files]
 bandit = [

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "async-stripe"
-version = "0.2.0-beta7"
+version = "0.2.0-beta8"
 description = "An asynchronous wrapper around the official stripe library."
 authors = [
     "Bharat Chauhan <tell.bhch@gmail.com>", 
@@ -20,7 +20,7 @@ keywords = ["stripe", "async", "asynchronous", "wrapper"]
 
 [tool.poetry.dependencies]
 python = "^3.5"
-stripe = "^2.57.0"
+stripe = "^2.18.1"
 tornado = "^6.1"
 
 [tool.poetry.dev-dependencies]

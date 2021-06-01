@@ -1,7 +1,6 @@
 from stripe import util
-
+from stripe import api_requestor
 from stripe.api_resources.abstract.api_resource import APIResource
-from async_stripe.api_requestor import AsyncAPIRequestor
 
 
 async def _static_request_patch(
@@ -14,7 +13,7 @@ async def _static_request_patch(
     stripe_account=None,
     **params
 ):
-    requestor = AsyncAPIRequestor(
+    requestor = api_requestor.APIRequestor(
         api_key, api_version=stripe_version, account=stripe_account
     )
     headers = util.populate_headers(idempotency_key)

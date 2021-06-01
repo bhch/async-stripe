@@ -1,14 +1,14 @@
 from stripe import util
+from stripe import api_requestor
 from stripe.api_resources.abstract.listable_api_resource import (
     ListableAPIResource,
 )
-from async_stripe.api_requestor import AsyncAPIRequestor
 
 
 async def list_patch(
     cls, api_key=None, stripe_version=None, stripe_account=None, **params
 ):
-    requestor = AsyncAPIRequestor(
+    requestor = api_requestor.APIRequestor(
         api_key,
         api_base=cls.api_base(),
         api_version=stripe_version,

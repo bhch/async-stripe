@@ -2,11 +2,11 @@ import stripe
 from async_stripe.api_resources.abstract import (
     patch_nested_resources, patch_custom_methods
 )
-from async_stripe.api_requestor import AsyncAPIRequestor
+from stripe import api_requestor
 
 
 async def delete_discount_patch(self, **params):
-    requestor = AsyncAPIRequestor(
+    requestor = api_requestor.APIRequestor(
         self.api_key,
         api_version=self.stripe_version,
         account=self.stripe_account,

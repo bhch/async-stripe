@@ -1,9 +1,9 @@
 from stripe import util
-
+from stripe import api_requestor
 from stripe.api_resources.abstract.createable_api_resource import (
     CreateableAPIResource,
 )
-from async_stripe.api_requestor import AsyncAPIRequestor
+
 
 async def create_patch(
     cls,
@@ -13,7 +13,7 @@ async def create_patch(
     stripe_account=None,
     **params
 ):
-    requestor = AsyncAPIRequestor(
+    requestor = api_requestor.APIRequestor(
         api_key, api_version=stripe_version, account=stripe_account
     )
     url = cls.class_url()

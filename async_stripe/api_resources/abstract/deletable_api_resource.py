@@ -3,7 +3,6 @@ from stripe.six.moves.urllib.parse import quote_plus
 from stripe.api_resources.abstract.deletable_api_resource import (
     DeletableAPIResource,
 )
-from async_stripe.api_requestor import AsyncAPIRequestor
 
 
 async def _cls_delete_patch(cls, sid, **params):

@@ -1,5 +1,5 @@
 from stripe import util
-from async_stripe.api_requestor import AsyncAPIRequestor
+from stripe import api_requestor
 
 
 def patch_nested_resources(cls, nested_resources):
@@ -17,7 +17,7 @@ def patch_nested_resources(cls, nested_resources):
             stripe_account=None,
             **params
         ):
-            requestor = AsyncAPIRequestor(
+            requestor = api_requestor.APIRequestor(
                 api_key, api_version=stripe_version, account=stripe_account
             )
             headers = util.populate_headers(idempotency_key)

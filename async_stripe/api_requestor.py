@@ -99,9 +99,14 @@ async def request_raw_patch(self, method, url, params=None, supplied_headers=Non
             body=post_data
         )
     except HTTPError as e:
-        rbody = e.response.body
-        rcode = e.response.code
-        rheaders = dict(e.response.headers)
+        if e.response:
+            rbody = e.response.body
+            rcode = e.response.code
+            rheaders = dict(e.response.headers)
+        else:
+            rbody = ''
+            rcode = ''
+            rheaders = {}
     except Exception as e:
         raise error.APIConnectionError("Network error: Couldn't connet to stripe")
     else:

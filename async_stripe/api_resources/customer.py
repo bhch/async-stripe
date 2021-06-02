@@ -25,6 +25,6 @@ patch_nested_resources(stripe.Customer, netsted_resources)
 
 # always patch custom methods after patching other methods
 custom_resources = [
-    {"name": "delete_discount", "http_verb": "delete"}
+    {"name": "delete_discount", "http_verb": "delete", "http_path": "discount"}
 ]
 patch_custom_methods(stripe.Customer, custom_resources)

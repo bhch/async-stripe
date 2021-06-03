@@ -12,6 +12,11 @@ async def _cls_delete_patch(cls, sid, **params):
 @util.class_method_variant("_cls_delete")
 async def delete_patch(self, **params):
     self.refresh_from(await self.request("delete", self.instance_url(), params))
+    return self
+
+
+DeletableAPIResource._cls_delete = classmethod(_cls_delete_patch)
+DeletableAPIResource.delete = delete_patch
 
 
 for subclass in DeletableAPIResource.__subclasses__():

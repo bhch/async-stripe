@@ -6,8 +6,8 @@ from stripe.api_resources.abstract.updateable_api_resource import (
 
 
 async def modify_patch(cls, sid, **params):
-        url = "%s/%s" % (cls.class_url(), quote_plus(util.utf8(sid)))
-        return await cls._static_request("post", url, **params)
+    url = "%s/%s" % (cls.class_url(), quote_plus(util.utf8(sid)))
+    return await cls._static_request("post", url, **params)
 
 
 async def save_patch(self, idempotency_key=None):
@@ -23,6 +23,10 @@ async def save_patch(self, idempotency_key=None):
     else:
         util.logger.debug("Trying to save already saved object %r", self)
     return self
+
+
+UpdateableAPIResource.modify = classmethod(modify_patch)
+UpdateableAPIResource.save = save_patch
 
 
 for subclass in UpdateableAPIResource.__subclasses__():

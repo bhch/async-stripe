@@ -5,6 +5,11 @@ from stripe.api_resources.abstract.listable_api_resource import (
 )
 
 
+async def auto_paging_iter_patch(cls, *args, **params):
+    obj = await cls.list(*args, **params)
+    return obj.auto_paging_iter()
+
+
 async def list_patch(
     cls, api_key=None, stripe_version=None, stripe_account=None, **params
 ):
@@ -23,5 +28,10 @@ async def list_patch(
     return stripe_object
 
 
+ListableAPIResource.auto_paging_iter = classmethod(auto_paging_iter_patch)
+ListableAPIResource.list = classmethod(list_patch)
+
+
 for subclass in ListableAPIResource.__subclasses__():
+    subclass.auto_paging_iter = classmethod(auto_paging_iter_patch)
     subclass.list = classmethod(list_patch)

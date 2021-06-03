@@ -7,3 +7,4 @@ stripe.set_app_info('async-stripe', url='https://github.com/bhch/async-stripe')
 from async_stripe import stripe_object
 from async_stripe import api_requestor
 from async_stripe import api_resources
+from async_stripe import oauth

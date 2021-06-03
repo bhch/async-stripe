@@ -1,8 +1,5 @@
-from stripe import util
-from stripe import api_requestor
-from stripe.api_resources.abstract.createable_api_resource import (
-    CreateableAPIResource,
-)
+import stripe
+from stripe import api_requestor, util
 
 
 async def create_patch(
@@ -13,10 +10,15 @@ async def create_patch(
     stripe_account=None,
     **params
 ):
+    if "subscription_item" not in params:
+        raise ValueError("Params must have a subscription_item key")
+
+    subscription_item = params.pop("subscription_item")
+
     requestor = api_requestor.APIRequestor(
         api_key, api_version=stripe_version, account=stripe_account
     )
-    url = cls.class_url()
+    url = "/v1/subscription_items/%s/usage_records" % subscription_item
     headers = util.populate_headers(idempotency_key)
     response, api_key = await requestor.request("post", url, params, headers)
 
@@ -25,7 +27,4 @@ async def create_patch(
     )
 
 
-CreateableAPIResource.create = classmethod(create_patch)
-
-for subclass in CreateableAPIResource.__subclasses__():
-    subclass.create = classmethod(create_patch)
+stripe.UsageRecord.create = classmethod(create_patch)

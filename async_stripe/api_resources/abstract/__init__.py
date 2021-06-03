@@ -1,5 +1,7 @@
 from async_stripe.api_resources.abstract.api_resource import APIResource
 
+from async_stripe.api_resources.abstract.verify_mixin import VerifyMixin
+
 from async_stripe.api_resources.abstract.createable_api_resource import (
     CreateableAPIResource,
 )

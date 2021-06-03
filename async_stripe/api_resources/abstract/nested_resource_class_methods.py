@@ -4,8 +4,7 @@ from stripe import api_requestor
 
 def patch_nested_resources(cls, nested_resources):
     for resource in nested_resources:
-        resource_plural = '%ss' % resource
-        nested_resource_request_method = '%s_request' % resource_plural
+        nested_resource_request_method = '%ss_request' % resource
 
         async def nested_resource_request(
             cls,

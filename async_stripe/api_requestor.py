@@ -1,3 +1,4 @@
+import stripe
 from stripe import error, version, util, six
 from stripe.multipart_data_generator import MultipartDataGenerator
 from stripe.six.moves.urllib.parse import urlencode
@@ -5,10 +6,58 @@ from stripe.six.moves.urllib.parse import urlencode
 from stripe.api_requestor import APIRequestor
 from stripe.api_requestor import _build_api_url, _api_encode
 
-from tornado.httpclient import AsyncHTTPClient, HTTPError
+from async_stripe import http_client
 
 
-client = AsyncHTTPClient()
+def init_patch(
+    self,
+    key=None,
+    client=None,
+    api_base=None,
+    api_version=None,
+    account=None,
+):
+    self.api_base = api_base or stripe.api_base
+    self.api_key = key
+    self.api_version = api_version or stripe.api_version
+    self.stripe_account = account
+
+    self._default_proxy = None
+
+    from stripe import verify_ssl_certs as verify
+    from stripe import proxy
+
+    # only use client if mockclient (for testing)
+    # otherwise use Tornado client
+    if client:
+        if client.name == 'mockclient':
+            self._client = client
+    elif stripe.default_http_client and \
+        (
+            stripe.default_http_client.name == 'mockclient' or \
+            isinstance(stripe.default_http_client, http_client.TornadoAsyncHTTPClient)
+        ):
+
+        self._client = stripe.default_http_client
+        if proxy != self._default_proxy:
+            warnings.warn(
+                "stripe.proxy was updated after sending a "
+                "request - this is a no-op. To use a different proxy, "
+                "set stripe.default_http_client to a new client "
+                "configured with the proxy."
+            )
+    else:
+        # If the stripe.default_http_client has not been set by the user
+        # yet, we'll set it here. This way, we aren't creating a new
+        # HttpClient for every request.
+        stripe.default_http_client = http_client.new_default_http_client(
+            verify_ssl_certs=verify, proxy=proxy
+        )
+        self._client = stripe.default_http_client
+        self._default_proxy = proxy
+
+
+APIRequestor.__init__ = init_patch
 
 
 async def request_patch(self, method, url, params=None, headers=None):
@@ -89,31 +138,10 @@ async def request_raw_patch(self, method, url, params=None, supplied_headers=Non
         api_version=self.api_version,
     )
 
-    # :TODO: Add telemetry headers as done by the official library
-    # :TODO: Add retry support on error
-    try:
-        response = await client.fetch(
-            abs_url, 
-            method=method.upper(), 
-            headers=headers, 
-            body=post_data
-        )
-    except HTTPError as e:
-        if e.response:
-            rbody = e.response.body
-            rcode = e.response.code
-            rheaders = dict(e.response.headers)
-        else:
-            rbody = ''
-            rcode = ''
-            rheaders = {}
-    except Exception as e:
-        raise error.APIConnectionError("Network error: Couldn't connet to stripe")
-    else:
-        rbody = response.body
-        rcode = response.code
-        rheaders = dict(response.headers)
-
+    rbody, rcode, rheaders = await self._client.request_with_retries(
+        method, abs_url, headers, post_data
+    )
+    
     util.log_info("Stripe API response", path=abs_url, response_code=rcode)
     util.log_debug("API response body", body=rbody)
 
@@ -125,7 +153,6 @@ async def request_raw_patch(self, method, url, params=None, supplied_headers=Non
         )
 
     return rbody, rcode, rheaders, my_api_key
-
 
 
 APIRequestor.request_raw = request_raw_patch

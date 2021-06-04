@@ -21,7 +21,7 @@ keywords = ["stripe", "async", "asynchronous", "wrapper"]
 [tool.poetry.dependencies]
 python = "^3.6"
 stripe = "^2.18.1"
-tornado = "^6.1"
+tornado = ">=5.1"
 
 [tool.poetry.dev-dependencies]
 bandit = "^1.7.0"

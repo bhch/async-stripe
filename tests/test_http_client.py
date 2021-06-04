@@ -6,17 +6,22 @@ import json
 import stripe
 from stripe import six
 
+from async_stripe.http_client import TornadoAsyncHTTPClient
+
+
+pytestmark = pytest.mark.asyncio
+
 VALID_API_METHODS = ("get", "post", "delete")
 
 
 class StripeClientTestCase(object):
-    REQUEST_LIBRARIES = ["urlfetch", "requests", "pycurl", "urllib.request"]
+    REQUEST_LIBRARIES = ["AsyncHTTPClient"]
 
     @pytest.fixture
     def request_mocks(self, mocker):
         request_mocks = {}
         for lib in self.REQUEST_LIBRARIES:
-            request_mocks[lib] = mocker.patch("stripe.http_client.%s" % (lib,))
+            request_mocks[lib] = mocker.patch("async_stripe.http_client.%s" % (lib,))
         return request_mocks
 
 
@@ -36,22 +41,10 @@ class TestNewDefaultHttpClient(StripeClientTestCase):
 
         assert isinstance(inst, expected)
 
-    def test_new_default_http_client_urlfetch(self):
-        self.check_default((), stripe.http_client.UrlFetchClient)
+    def test_new_default_http_client_tornado(self):
+        self.check_default((), TornadoAsyncHTTPClient)
 
-    def test_new_default_http_client_requests(self):
-        self.check_default(("urlfetch",), stripe.http_client.RequestsClient)
-
-    def test_new_default_http_client_pycurl(self):
-        self.check_default(
-            ("urlfetch", "requests"), stripe.http_client.PycurlClient
-        )
-
-    def test_new_default_http_client_urllib2(self):
-        self.check_default(
-            ("urlfetch", "requests", "pycurl"),
-            stripe.http_client.Urllib2Client,
-        )
+    
 
 
 class TestRetrySleepTimeDefaultHttpClient(StripeClientTestCase):
@@ -213,7 +206,7 @@ class TestHTTPClient(object):
         yield
         stripe.enable_telemetry = orig_attrs["enable_telemetry"]
 
-    def test_sends_telemetry_on_second_request(self, mocker):
+    async def test_sends_telemetry_on_second_request(self, mocker):
         class TestClient(stripe.http_client.HTTPClient):
             pass
 
@@ -223,17 +216,18 @@ class TestHTTPClient(object):
 
         client = TestClient()
 
-        client.request = mocker.MagicMock(
+        client.request = mocker.AsyncMock(
             return_value=["", 200, {"Request-Id": "req_123"}]
         )
-        _, code, _ = client.request_with_retries("get", url, {}, None)
+
+        _, code, _ = await client.request_with_retries("get", url, {}, None)
         assert code == 200
         client.request.assert_called_with("get", url, {}, None)
 
-        client.request = mocker.MagicMock(
+        client.request = mocker.AsyncMock(
             return_value=["", 200, {"Request-Id": "req_234"}]
         )
-        _, code, _ = client.request_with_retries("get", url, {}, None)
+        _, code, _ = await client.request_with_retries("get", url, {}, None)
         assert code == 200
         args, _ = client.request.call_args
         assert "X-Stripe-Client-Telemetry" in args[2]
@@ -308,456 +302,8 @@ class ClientTestBase(object):
             self.make_request("get", self.valid_url, {}, None)
 
 
-class RequestsVerify(object):
-    def __eq__(self, other):
-        return other and other.endswith("stripe/data/ca-certificates.crt")
-
-
-class TestRequestsClient(StripeClientTestCase, ClientTestBase):
-    REQUEST_CLIENT = stripe.http_client.RequestsClient
-
-    @pytest.fixture
-    def session(self, mocker, request_mocks):
-        return mocker.MagicMock()
-
-    @pytest.fixture
-    def mock_response(self, mocker, session):
-        def mock_response(mock, body, code):
-            result = mocker.Mock()
-            result.content = body
-            result.status_code = code
-            result.headers = {}
-
-            session.request = mocker.MagicMock(return_value=result)
-            mock.Session = mocker.MagicMock(return_value=session)
-
-        return mock_response
-
-    @pytest.fixture
-    def mock_error(self, mocker, session):
-        def mock_error(mock):
-            # The first kind of request exceptions we catch
-            mock.exceptions.SSLError = Exception
-            session.request.side_effect = mock.exceptions.SSLError()
-            mock.Session = mocker.MagicMock(return_value=session)
-
-        return mock_error
-
-    # Note that unlike other modules, we don't use the "mock" argument here
-    # because we need to run the request call against the internal mock
-    # session.
-    @pytest.fixture
-    def check_call(self, session):
-        def check_call(
-            mock, method, url, post_data, headers, timeout=80, times=None
-        ):
-            times = times or 1
-            args = (method, url)
-            kwargs = {
-                "headers": headers,
-                "data": post_data,
-                "verify": RequestsVerify(),
-                "proxies": {"http": "http://slap/", "https": "http://slap/"},
-                "timeout": timeout,
-            }
-            calls = [(args, kwargs) for _ in range(times)]
-            session.request.assert_has_calls(calls)
-
-        return check_call
-
-    def make_request(self, method, url, headers, post_data, timeout=80):
-        client = self.REQUEST_CLIENT(
-            verify_ssl_certs=True, timeout=timeout, proxy="http://slap/"
-        )
-        return client.request_with_retries(method, url, headers, post_data)
-
-    def test_timeout(self, request_mock, mock_response, check_call):
-        headers = {"my-header": "header val"}
-        data = ""
-        mock_response(request_mock, '{"foo": "baz"}', 200)
-        self.make_request("POST", self.valid_url, headers, data, timeout=5)
-
-        check_call(None, "POST", self.valid_url, data, headers, timeout=5)
-
-
-class TestRequestClientRetryBehavior(TestRequestsClient):
-    @pytest.fixture
-    def response(self, mocker):
-        def response(code=200, headers={}):
-            result = mocker.Mock()
-            result.content = "{}"
-            result.status_code = code
-            result.headers = headers
-            return result
-
-        return response
-
-    @pytest.fixture
-    def mock_retry(self, mocker, session, request_mock):
-        def mock_retry(retry_error_num=0, no_retry_error_num=0, responses=[]):
-
-            # Mocking classes of exception we catch. Any group of exceptions
-            # with the same inheritance pattern will work
-            request_root_error_class = Exception
-            request_mock.exceptions.RequestException = request_root_error_class
-
-            no_retry_parent_class = LookupError
-            no_retry_child_class = KeyError
-            request_mock.exceptions.SSLError = no_retry_parent_class
-            no_retry_errors = [no_retry_child_class()] * no_retry_error_num
-
-            retry_parent_class = EnvironmentError
-            retry_child_class = IOError
-            request_mock.exceptions.Timeout = retry_parent_class
-            request_mock.exceptions.ConnectionError = retry_parent_class
-            retry_errors = [retry_child_class()] * retry_error_num
-
-            # Include mock responses as possible side-effects
-            # to simulate returning proper results after some exceptions
-            session.request.side_effect = (
-                retry_errors + no_retry_errors + responses
-            )
-
-            request_mock.Session = mocker.MagicMock(return_value=session)
-            return request_mock
-
-        return mock_retry
-
-    @pytest.fixture
-    def check_call_numbers(self, check_call):
-        valid_url = self.valid_url
-
-        def check_call_numbers(times):
-            check_call(None, "GET", valid_url, None, {}, times=times)
-
-        return check_call_numbers
-
-    def max_retries(self):
-        return 3
-
-    def make_request(self):
-        client = self.REQUEST_CLIENT(
-            verify_ssl_certs=True, timeout=80, proxy="http://slap/"
-        )
-        # Override sleep time to speed up tests
-        client._sleep_time = lambda _: 0.0001
-        # Override configured max retries
-        client._max_network_retries = lambda: self.max_retries()
-        return client.request_with_retries("GET", self.valid_url, {}, None)
-
-    def test_retry_error_until_response(
-        self, mock_retry, response, check_call_numbers
-    ):
-        mock_retry(retry_error_num=1, responses=[response(code=202)])
-        _, code, _ = self.make_request()
-        assert code == 202
-        check_call_numbers(2)
-
-    def test_retry_error_until_exceeded(
-        self, mock_retry, response, check_call_numbers
-    ):
-        mock_retry(retry_error_num=self.max_retries())
-        with pytest.raises(stripe.error.APIConnectionError):
-            self.make_request()
-
-        check_call_numbers(self.max_retries())
-
-    def test_no_retry_error(self, mock_retry, response, check_call_numbers):
-        mock_retry(no_retry_error_num=self.max_retries())
-        with pytest.raises(stripe.error.APIConnectionError):
-            self.make_request()
-        check_call_numbers(1)
-
-    def test_retry_codes(self, mock_retry, response, check_call_numbers):
-        mock_retry(responses=[response(code=409), response(code=202)])
-        _, code, _ = self.make_request()
-        assert code == 202
-        check_call_numbers(2)
-
-    def test_retry_codes_until_exceeded(
-        self, mock_retry, response, check_call_numbers
-    ):
-        mock_retry(responses=[response(code=409)] * (self.max_retries() + 1))
-        _, code, _ = self.make_request()
-        assert code == 409
-        check_call_numbers(self.max_retries() + 1)
-
-    @pytest.fixture
-    def connection_error(self, session):
-        client = self.REQUEST_CLIENT()
-
-        def connection_error(given_exception):
-            with pytest.raises(stripe.error.APIConnectionError) as error:
-                client._handle_request_error(given_exception)
-            return error.value
-
-        return connection_error
-
-    def test_handle_request_error_should_retry(
-        self, connection_error, mock_retry
-    ):
-        request_mock = mock_retry()
-
-        error = connection_error(request_mock.exceptions.Timeout())
-        assert error.should_retry
-
-        error = connection_error(request_mock.exceptions.ConnectionError())
-        assert error.should_retry
-
-    def test_handle_request_error_should_not_retry(
-        self, connection_error, mock_retry
-    ):
-        request_mock = mock_retry()
-
-        error = connection_error(request_mock.exceptions.SSLError())
-        assert error.should_retry is False
-        assert "not verify Stripe's SSL certificate" in error.user_message
-
-        error = connection_error(request_mock.exceptions.RequestException())
-        assert error.should_retry is False
-
-        # Mimic non-requests exception as not being children of Exception,
-        # See mock_retry for the exceptions setup
-        error = connection_error(BaseException(""))
-        assert error.should_retry is False
-        assert "configuration issue locally" in error.user_message
-
-    # Skip inherited basic requests client tests
-    def test_request(self, request_mock, mock_response, check_call):
-        pass
-
-    def test_exception(self, request_mock, mock_error):
-        pass
-
-    def test_timeout(self, request_mock, mock_response, check_call):
-        pass
-
-
-class TestUrlFetchClient(StripeClientTestCase, ClientTestBase):
-    REQUEST_CLIENT = stripe.http_client.UrlFetchClient
-
-    @pytest.fixture
-    def mock_response(self, mocker):
-        def mock_response(mock, body, code):
-            result = mocker.Mock()
-            result.content = body
-            result.status_code = code
-            result.headers = {}
-
-            mock.fetch = mocker.Mock(return_value=result)
-
-        return mock_response
-
-    @pytest.fixture
-    def mock_error(self):
-        def mock_error(mock):
-            mock.Error = mock.InvalidURLError = Exception
-            mock.fetch.side_effect = mock.InvalidURLError()
-
-        return mock_error
-
-    @pytest.fixture
-    def check_call(self):
-        def check_call(mock, method, url, post_data, headers):
-            mock.fetch.assert_called_with(
-                url=url,
-                method=method,
-                headers=headers,
-                validate_certificate=True,
-                deadline=55,
-                payload=post_data,
-            )
-
-        return check_call
-
-
-class TestUrllib2Client(StripeClientTestCase, ClientTestBase):
-    REQUEST_CLIENT = stripe.http_client.Urllib2Client
-
-    def make_request(self, method, url, headers, post_data, proxy=None):
-        self.client = self.REQUEST_CLIENT(verify_ssl_certs=True, proxy=proxy)
-        self.proxy = proxy
-        return self.client.request_with_retries(
-            method, url, headers, post_data
-        )
-
-    @pytest.fixture
-    def mock_response(self, mocker):
-        def mock_response(mock, body, code):
-            response = mocker.Mock()
-            response.read = mocker.Mock(return_value=body)
-            response.code = code
-            response.info = mocker.Mock(return_value={})
-
-            self.request_object = mocker.Mock()
-            mock.Request = mocker.Mock(return_value=self.request_object)
-
-            mock.urlopen = mocker.Mock(return_value=response)
-
-            opener = mocker.Mock()
-            opener.open = mocker.Mock(return_value=response)
-            mock.build_opener = mocker.Mock(return_value=opener)
-            mock.build_opener.open = opener.open
-            mock.ProxyHandler = mocker.Mock(return_value=opener)
-
-            mock.urlopen = mocker.Mock(return_value=response)
-
-        return mock_response
-
-    @pytest.fixture
-    def mock_error(self):
-        def mock_error(mock):
-            mock.urlopen.side_effect = ValueError
-            mock.build_opener().open.side_effect = ValueError
-            mock.build_opener.reset_mock()
-
-        return mock_error
-
-    @pytest.fixture
-    def check_call(self):
-        def check_call(mock, method, url, post_data, headers):
-            if six.PY3 and isinstance(post_data, six.string_types):
-                post_data = post_data.encode("utf-8")
-
-            mock.Request.assert_called_with(url, post_data, headers)
-
-            if self.client._proxy:
-                assert isinstance(self.client._proxy, dict)
-                mock.ProxyHandler.assert_called_with(self.client._proxy)
-                mock.build_opener.open.assert_called_with(self.request_object)
-                assert not mock.urlopen.called
-
-            if not self.client._proxy:
-                mock.urlopen.assert_called_with(self.request_object)
-                assert not mock.build_opener.called
-                assert not mock.build_opener.open.called
-
-        return check_call
-
-
-class TestUrllib2ClientHttpsProxy(TestUrllib2Client):
-    def make_request(self, method, url, headers, post_data, proxy=None):
-        return super(TestUrllib2ClientHttpsProxy, self).make_request(
-            method,
-            url,
-            headers,
-            post_data,
-            {"http": "http://slap/", "https": "http://slap/"},
-        )
-
-
-class TestUrllib2ClientHttpProxy(TestUrllib2Client):
-    def make_request(self, method, url, headers, post_data, proxy=None):
-        return super(TestUrllib2ClientHttpProxy, self).make_request(
-            method, url, headers, post_data, "http://slap/"
-        )
-
-
-class TestPycurlClient(StripeClientTestCase, ClientTestBase):
-    REQUEST_CLIENT = stripe.http_client.PycurlClient
-
-    def make_request(self, method, url, headers, post_data, proxy=None):
-        self.client = self.REQUEST_CLIENT(verify_ssl_certs=True, proxy=proxy)
-        self.proxy = proxy
-        return self.client.request_with_retries(
-            method, url, headers, post_data
-        )
-
-    @pytest.fixture
-    def curl_mock(self, mocker):
-        return mocker.Mock()
-
-    @pytest.fixture
-    def request_mock(self, mocker, request_mocks, curl_mock):
-        lib_mock = request_mocks[self.REQUEST_CLIENT.name]
-        lib_mock.Curl = mocker.Mock(return_value=curl_mock)
-        return curl_mock
-
-    @pytest.fixture
-    def bio_getvalue(self, mocker):
-        bio_patcher = mocker.patch("stripe.util.io.BytesIO")
-        bio_mock = mocker.Mock()
-        bio_patcher.return_value = bio_mock
-        bio_getvalue = bio_mock.getvalue
-        return bio_getvalue
-
-    @pytest.fixture
-    def mock_response(self, bio_getvalue):
-        def mock_response(mock, body, code):
-            bio_getvalue.return_value = body.encode("utf-8")
-            mock.getinfo.return_value = code
-
-        return mock_response
-
-    @pytest.fixture
-    def mock_error(self):
-        def mock_error(mock):
-            class FakeException(BaseException):
-                @property
-                def args(self):
-                    return ("foo", "bar")
-
-            stripe.http_client.pycurl.error = FakeException
-            mock.perform.side_effect = stripe.http_client.pycurl.error
-
-        return mock_error
-
-    @pytest.fixture
-    def check_call(self, request_mocks):
-        def check_call(mock, method, url, post_data, headers):
-            lib_mock = request_mocks[self.REQUEST_CLIENT.name]
-
-            if self.client._proxy:
-                proxy = self.client._get_proxy(url)
-                assert proxy is not None
-                if proxy.hostname:
-                    mock.setopt.assert_any_call(lib_mock.PROXY, proxy.hostname)
-                if proxy.port:
-                    mock.setopt.assert_any_call(lib_mock.PROXYPORT, proxy.port)
-                if proxy.username or proxy.password:
-                    mock.setopt.assert_any_call(
-                        lib_mock.PROXYUSERPWD,
-                        "%s:%s" % (proxy.username, proxy.password),
-                    )
-
-            # A note on methodology here: we don't necessarily need to verify
-            # _every_ call to setopt, but check a few of them to make sure the
-            # right thing is happening. Keep an eye specifically on conditional
-            # statements where things are more likely to go wrong.
-
-            mock.setopt.assert_any_call(lib_mock.NOSIGNAL, 1)
-            mock.setopt.assert_any_call(lib_mock.URL, stripe.util.utf8(url))
-
-            if method == "get":
-                mock.setopt.assert_any_call(lib_mock.HTTPGET, 1)
-            elif method == "post":
-                mock.setopt.assert_any_call(lib_mock.POST, 1)
-            else:
-                mock.setopt.assert_any_call(
-                    lib_mock.CUSTOMREQUEST, method.upper()
-                )
-
-            mock.perform.assert_any_call()
-
-        return check_call
-
-
-class TestPycurlClientHttpProxy(TestPycurlClient):
-    def make_request(self, method, url, headers, post_data, proxy=None):
-        return super(TestPycurlClientHttpProxy, self).make_request(
-            method, url, headers, post_data, "http://user:withPwd@slap:8888/"
-        )
-
-
-class TestPycurlClientHttpsProxy(TestPycurlClient):
-    def make_request(self, method, url, headers, post_data, proxy=None):
-        return super(TestPycurlClientHttpsProxy, self).make_request(
-            method,
-            url,
-            headers,
-            post_data,
-            {"http": "http://slap:8888/", "https": "http://slap2:444/"},
-        )
+class TestTornadoAsyncHTTPClient:
+    pass
 
 
 class TestAPIEncode(StripeClientTestCase):

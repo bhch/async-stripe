@@ -11,7 +11,7 @@ Monkey-patching allows us to avoid a complete rewrite and keep the usage api
 similar to the official library.
 
 This **doesn't use threads**, but **actual async coroutines** and 
-[non-blockin http client][1] to make requests.
+[non-blocking http client][1] to make requests.
 
 ## Usage
 
@@ -37,9 +37,12 @@ async methods and the original synchronous api won't be available.
 
 ---
 
-## Testing
+## Development and Testing
 
-First, [install and run the `stripe-mock` api server][2].
+When adding new features and monkey-patches, please add relevant tests and 
+ensure that all the tests also pass.
+
+For testing, first, [install and run the `stripe-mock` api server][2].
 
 Next, install `pytest`, `pytest-mock` and `pytest-asyncio` python packages in 
 your virtualenv.

@@ -1,0 +1,1 @@
+from async_stripe.api_resources.identity import verification_session

@@ -13,6 +13,14 @@ similar to the official library.
 This **doesn't use threads**, but **actual async coroutines** and 
 [non-blocking http client][1] to make requests.
 
+## Install
+
+Install requires Python 3.6 or newer.
+
+```sh
+$ pip install async-stripe
+```
+
 ## Usage
 
 The usage api is similar to Stripe's official library:

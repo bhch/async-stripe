@@ -1,13 +1,21 @@
 # async-stripe
 
-An asynchronous wrapper around the official stripe library. 
+An asynchronous wrapper around Stripe's official python library. 
 
-/!\ **Note:** This is still a work in progress and doesn't provide async support 
-for all the resources yet.
+## How it works
+
+async-stripe monkey-patches the stripe library and replaces the synchronous 
+http request methods with asynchronous methods.
+
+Monkey-patching allows us to avoid a complete rewrite and keep the usage api 
+similar to the official library.
+
+This **doesn't use threads**, but **actual async coroutines** and 
+[non-blockin http client][1] to make requests.
 
 ## Usage
 
-The usage api is kept very similar to stripe's official library:
+The usage api is similar to Stripe's official library:
 
 ```python
 from async_stripe import stripe
@@ -19,17 +27,43 @@ payment_intent = await stripe.PaymentIntent.create(amount=1000, currency='usd')
 print(payment_intent.id)
 ```
 
-### Sync usage
+---
 
-Currently, only a limited operations have async usage. For those cases, you'll 
-have to fall back to using sync code (without the `await` keyword).
+**/!\ Note:** Since this library monkey-patches the actual `stripe` library, 
+you should avoid using the two in the same process.
 
-## Requirements
+Once you import `async_stripe`, the official `stripe` library gets patched with 
+async methods and the original synchronous api won't be available.
 
- + Tornado (used for making async http requests)
- + stripe (official stripe library)
+---
 
+## Testing
+
+First, [install and run the `stripe-mock` api server][2].
+
+Next, install `pytest`, `pytest-mock` and `pytest-asyncio` python packages in 
+your virtualenv.
+
+Finally, run the tests like this:
+
+```sh
+$ pytest tests
+
+# or run a specific test
+$ pytests tests/api_resources/test_customer.py
+$ pytests tests/api_resources/test_customer.py::TestCustomer
+```
 
 ## License
 
-[BSD-3-Clause](LICENSE.txt)
+A lot of the code (especially tests) are copied with slight modifications from 
+Stripe's official library. That code is licensed under 
+[MIT License][3].
+
+Rest of the original code is licensed under [BSD-3-Clause License][4].
+
+
+[1]: https://www.tornadoweb.org/en/stable/httpclient.html#tornado.httpclient.AsyncHTTPClient
+[2]: https://github.com/stripe/stripe-mock
+[3]: LICENSE.stripe.txt
+[4]: LICENSE.txt

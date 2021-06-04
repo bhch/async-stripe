@@ -45,6 +45,19 @@ async methods and the original synchronous api won't be available.
 
 ---
 
+## Configuration
+
+Please see [`stripe-python`'s README][5] file for configuring logging and other things.
+
+#### Unsupported configurations:
+
+`async-stripe` aims to be a drop-in async replacement for `stripe`. However, 
+there are a few things which are not yet supported:
+
+ - Custom http client: Currently, it's not possible to configure a 
+ custom http client and Tornado's [`AsyncHTTPClient`][1] will be used by default.
+ - Proxy: Connecting to api via a proxy is supported yet.
+
 ## Development and Testing
 
 When adding new features and monkey-patches, please add relevant tests and 
@@ -78,3 +91,4 @@ Rest of the original code is licensed under [BSD-3-Clause License][4].
 [2]: https://github.com/stripe/stripe-mock
 [3]: LICENSE.stripe.txt
 [4]: LICENSE.txt
+[5]: https://github.com/stripe/stripe-python/blob/master/README.md

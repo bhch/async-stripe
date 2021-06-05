@@ -5,6 +5,7 @@ import json
 import tempfile
 import uuid
 from collections import OrderedDict
+import asyncio
 
 import pytest
 
@@ -241,8 +242,10 @@ class TestAPIRequestor(object):
     @pytest.fixture
     def mock_response(self, mocker, http_client):
         def mock_response(return_body, return_code, headers=None):
-            http_client.request_with_retries = mocker.AsyncMock(
-                return_value=(return_body, return_code, headers or {})
+            response_future = asyncio.Future()
+            response_future.set_result((return_body, return_code, headers or {}))
+            http_client.request_with_retries = mocker.Mock(
+                return_value=response_future
             )
 
         return mock_response
@@ -655,7 +658,9 @@ class TestDefaultClient(object):
         hc = mocker.Mock(stripe.http_client.HTTPClient)
         hc._verify_ssl_certs = False
         hc.name = "mockclient"
-        hc.request_with_retries = mocker.AsyncMock(return_value=("{}", 200, {}))
+        response_future = asyncio.Future()
+        response_future.set_result(("{}", 200, {}))
+        hc.request_with_retries = mocker.Mock(return_value=response_future)
 
         stripe.default_http_client = hc
         await stripe.Charge.list(limit=3)

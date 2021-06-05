@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function
 
 import pytest
 import json
+import asyncio
 
 import stripe
 from stripe import six
@@ -216,16 +217,22 @@ class TestHTTPClient(object):
 
         client = TestClient()
 
-        client.request = mocker.AsyncMock(
-            return_value=["", 200, {"Request-Id": "req_123"}]
+        response_future = asyncio.Future()
+        response_future.set_result(["", 200, {"Request-Id": "req_123"}])
+
+        client.request = mocker.MagicMock(
+            return_value=response_future
         )
 
         _, code, _ = await client.request_with_retries("get", url, {}, None)
         assert code == 200
         client.request.assert_called_with("get", url, {}, None)
 
-        client.request = mocker.AsyncMock(
-            return_value=["", 200, {"Request-Id": "req_234"}]
+        response_future = asyncio.Future()
+        response_future.set_result(["", 200, {"Request-Id": "req_234"}])
+
+        client.request = mocker.MagicMock(
+            return_value=response_future
         )
         _, code, _ = await client.request_with_retries("get", url, {}, None)
         assert code == 200

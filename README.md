@@ -58,12 +58,16 @@ there are a few things which are not yet supported:
 
  - Custom http client: Currently, it's not possible to configure a 
  custom http client and Tornado's [`AsyncHTTPClient`][1] will be used by default.
- - Proxy: Connecting to api via a proxy is supported yet.
+ - Proxy: Connecting to api via a proxy is not supported yet.
 
 ## Development and Testing
 
 When adding new features and monkey-patches, please add relevant tests and 
-ensure that all the tests also pass.
+ensure that all the tests also pass. 
+
+In most cases, you shouldn't need to write the tests yourself: you can just 
+copy-paste the tests form the original stripe library and change the synchronous 
+methods to asynchronous methods. 
 
 For testing, first, [install and run the `stripe-mock` api server][2].
 
@@ -76,8 +80,8 @@ Finally, run the tests like this:
 $ pytest tests
 
 # or run a specific test
-$ pytests tests/api_resources/test_customer.py
-$ pytests tests/api_resources/test_customer.py::TestCustomer
+$ pytest tests/api_resources/test_customer.py
+$ pytest tests/api_resources/test_customer.py::TestCustomer
 ```
 
 ## License

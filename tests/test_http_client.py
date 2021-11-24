@@ -5,7 +5,8 @@ import json
 import asyncio
 
 import stripe
-from stripe import six
+import urllib3
+from stripe import six, util
 
 from async_stripe.http_client import TornadoAsyncHTTPClient
 
@@ -256,6 +257,12 @@ class ClientTestBase(object):
         client = self.REQUEST_CLIENT(verify_ssl_certs=True)
         return client.request_with_retries(method, url, headers, post_data)
 
+    async def make_request_stream(self, method, url, headers, post_data):
+        client = self.REQUEST_CLIENT(verify_ssl_certs=True)
+        return await client.request_stream_with_retries(
+            method, url, headers, post_data
+        )
+
     @pytest.fixture
     def mock_response(self):
         def mock_response(mock, body, code):
@@ -276,7 +283,9 @@ class ClientTestBase(object):
 
     @pytest.fixture
     def check_call(self):
-        def check_call(mock, method, abs_url, headers, params):
+        def check_call(
+            mock, method, abs_url, headers, params, is_streaming=False
+        ):
             raise NotImplementedError(
                 "You must implement this in your test subclass"
             )
@@ -303,6 +312,39 @@ class ClientTestBase(object):
 
             check_call(request_mock, method, abs_url, data, headers)
 
+    def test_request_stream(
+        self, mocker, request_mock, mock_response, check_call
+    ):
+        for method in VALID_API_METHODS:
+            mock_response(request_mock, "some streamed content", 200)
+
+            abs_url = self.valid_url
+            data = ""
+
+            if method != "post":
+                abs_url = "%s?%s" % (abs_url, data)
+                data = None
+
+            headers = {"my-header": "header val"}
+
+            print(dir(self))
+            print("make_request_stream" in dir(self))
+            stream, code, _ = self.make_request_stream(
+                method, abs_url, headers, data
+            )
+
+            assert code == 200
+
+            # Here we need to convert and align all content on one type (string)
+            # as some clients return a string stream others a byte stream.
+            body_content = stream.read()
+            if hasattr(body_content, "decode"):
+                body_content = body_content.decode("utf-8")
+
+            assert body_content == "some streamed content"
+
+            mocker.resetall()
+
     def test_exception(self, request_mock, mock_error):
         mock_error(request_mock)
         with pytest.raises(stripe.error.APIConnectionError):
@@ -310,6 +352,7 @@ class ClientTestBase(object):
 
 
 class TestTornadoAsyncHTTPClient:
+    # :TODO: Write tests for tornado client
     pass
 
 

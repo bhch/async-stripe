@@ -25,6 +25,26 @@ async def _static_request_patch(
 APIResource._static_request = classmethod(_static_request_patch)
 
 
+async def _static_request_stream_patch(
+    cls,
+    method_,
+    url_,
+    api_key=None,
+    idempotency_key=None,
+    stripe_version=None,
+    stripe_account=None,
+    **params
+):
+    requestor = api_requestor.APIRequestor(
+        api_key, api_version=stripe_version, account=stripe_account
+    )
+    headers = util.populate_headers(idempotency_key)
+    response, _ = await requestor.request_stream(method_, url_, params, headers)
+    return response
+
+APIResource._static_request_stream = classmethod(_static_request_stream_patch)
+
+
 async def retrieve_patch(cls, id, api_key=None, **params):
     instance = cls(id, api_key, **params)
     await instance.refresh()

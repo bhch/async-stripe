@@ -21,3 +21,19 @@ async def request_patch(self, method, url, params=None, headers=None):
     )
 
 StripeObject.request = request_patch
+
+
+async def request_stream_patch(self, method, url, params=None, headers=None):
+    if params is None:
+        params = self._retrieve_params
+    requestor = api_requestor.APIRequestor(
+        key=self.api_key,
+        api_base=self.api_base(),
+        api_version=self.stripe_version,
+        account=self.stripe_account,
+    )
+    response, _ = await requestor.request_stream(method, url, params, headers)
+
+    return response
+
+StripeObject.request_stream = request_stream_patch

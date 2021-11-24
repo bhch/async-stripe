@@ -62,7 +62,7 @@ APIRequestor.__init__ = init_patch
 
 async def request_patch(self, method, url, params=None, headers=None):
     rbody, rcode, rheaders, my_api_key = await self.request_raw(
-        method.lower(), url, params, headers
+        method.lower(), url, params, headers, is_streaming=False
     )
     resp = self.interpret_response(rbody, rcode, rheaders)
     return resp, my_api_key
@@ -71,7 +71,18 @@ async def request_patch(self, method, url, params=None, headers=None):
 APIRequestor.request = request_patch 
 
 
-async def request_raw_patch(self, method, url, params=None, supplied_headers=None):
+async def request_stream_patch(self, method, url, params=None, headers=None):
+    stream, rcode, rheaders, my_api_key = await self.request_raw(
+        method.lower(), url, params, headers, is_streaming=True
+    )
+    resp = self.interpret_streaming_response(stream, rcode, rheaders)
+    return resp, my_api_key
+
+
+APIRequestor.request_stream = request_stream_patch
+
+
+async def request_raw_patch(self, method, url, params=None, supplied_headers=None, is_streaming=False):
     """
     Mechanism for issuing an API call
     """
@@ -138,12 +149,21 @@ async def request_raw_patch(self, method, url, params=None, supplied_headers=Non
         api_version=self.api_version,
     )
 
-    rbody, rcode, rheaders = await self._client.request_with_retries(
-        method, abs_url, headers, post_data
-    )
+    if is_streaming:
+        (
+            rcontent,
+            rcode,
+            rheaders,
+        ) = await self._client.request_stream_with_retries(
+            method, abs_url, headers, post_data
+        )
+    else:
+        rcontent, rcode, rheaders = await self._client.request_with_retries(
+            method, abs_url, headers, post_data
+        )
     
     util.log_info("Stripe API response", path=abs_url, response_code=rcode)
-    util.log_debug("API response body", body=rbody)
+    util.log_debug("API response body", body=rcontent)
 
     if "Request-Id" in rheaders:
         request_id = rheaders["Request-Id"]
@@ -152,7 +172,7 @@ async def request_raw_patch(self, method, url, params=None, supplied_headers=Non
             link=util.dashboard_link(request_id),
         )
 
-    return rbody, rcode, rheaders, my_api_key
+    return rcontent, rcode, rheaders, my_api_key
 
 
 APIRequestor.request_raw = request_raw_patch

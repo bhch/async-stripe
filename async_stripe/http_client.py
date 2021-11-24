@@ -26,6 +26,16 @@ class TornadoAsyncHTTPClient(HTTPClient):
         self.client = AsyncHTTPClient()
 
     async def request_with_retries(self, method, url, headers, post_data=None):
+        return await self._request_with_retries_internal(
+            method, url, headers, post_data, is_streaming=False
+        )
+
+    async def request_stream_with_retries(self, method, url, headers, post_data=None):
+        return await self._request_with_retries_internal(
+            method, url, headers, post_data, is_streaming=True
+        )
+
+    async def _request_with_retries_internal(self, method, url, headers, post_data, is_streaming):
         self._add_telemetry_header(headers)
 
         num_retries = 0
@@ -34,7 +44,12 @@ class TornadoAsyncHTTPClient(HTTPClient):
             request_start = _now_ms()
 
             try:
-                response = await self.request(method, url, headers, post_data)
+                if is_streaming:
+                    response = await self.request_stream(
+                        method, url, headers, post_data
+                    )
+                else:
+                    response = await self.request(method, url, headers, post_data)
                 connection_error = None
             except error.APIConnectionError as e:
                 connection_error = e
@@ -65,6 +80,16 @@ class TornadoAsyncHTTPClient(HTTPClient):
                     raise connection_error
 
     async def request(self, method, url, headers, post_data=None):
+        return await self._request_internal(
+            method, url, headers, post_data, is_streaming=False
+        )
+
+    async def request_stream(self, method, url, headers, post_data=None):
+        return await self._request_internal(
+            method, url, headers, post_data, is_streaming=True
+        )
+
+    async def _request_internal(self, method, url, headers, post_data, is_streaming):
         try:
             response = await self.client.fetch(
                 url, 
@@ -83,7 +108,13 @@ class TornadoAsyncHTTPClient(HTTPClient):
         except Exception as e:
             self._handle_request_error(e)
         else:
-            content = response.body
+            if is_streaming:
+                # :TODO:
+                # Currently, the full response is downloaded at once
+                # It will be better to actually stream response in chunks
+                content = util.io.BytesIO(response.body)
+            else:
+                content = response.body
             status_code = response.code
             headers = dict(response.headers)
         return content, status_code, headers
@@ -102,3 +133,5 @@ class TornadoAsyncHTTPClient(HTTPClient):
 
 # also patch base class
 HTTPClient.request_with_retries = TornadoAsyncHTTPClient.request_with_retries
+HTTPClient.request_stream_with_retries = TornadoAsyncHTTPClient.request_stream_with_retries
+HTTPClient._request_with_retries_internal = TornadoAsyncHTTPClient._request_with_retries_internal

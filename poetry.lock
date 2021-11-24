@@ -335,7 +335,7 @@ pbr = ">=2.0.0,<2.1.0 || >2.1.0"
 
 [[package]]
 name = "stripe"
-version = "2.61.0"
+version = "2.62.0"
 description = "Python bindings for the Stripe API"
 category = "main"
 optional = false
@@ -404,7 +404,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "e70e765c03695c9eed1c845f33a00fcafe4eb645e6e14ee47b505924d0db005e"
+content-hash = "849f84945d2a5310b97d4892fdcb1d00c3a882e15cd2faef426e926b4d2bd57c"
 
 [metadata.files]
 atomicwrites = [
@@ -575,8 +575,8 @@ stevedore = [
     {file = "stevedore-3.3.0.tar.gz", hash = "sha256:3a5bbd0652bf552748871eaa73a4a8dc2899786bc497a2aa1fcb4dcdb0debeee"},
 ]
 stripe = [
-    {file = "stripe-2.61.0-py2.py3-none-any.whl", hash = "sha256:5c6016362031a585d4f1138aff6e99c4c6d70b22b152b91fb6202d36bd8ac8c2"},
-    {file = "stripe-2.61.0.tar.gz", hash = "sha256:8131addd3512a22c4c539dda2d869a8f488e06f1b02d1f3a5f0f4848fc56184e"},
+    {file = "stripe-2.62.0-py2.py3-none-any.whl", hash = "sha256:026905a5732c28d42997e0bad774a07ca587e696a9b222738ededab3c3402250"},
+    {file = "stripe-2.62.0.tar.gz", hash = "sha256:1fb51d67a961ea889c5be324f020535ed511c6f483bd13a07f48f6e369fa8df0"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},

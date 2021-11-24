@@ -23,6 +23,12 @@ async def finalize_quote_patch(self, idempotency_key=None, **params):
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
+async def list_computed_upfront_line_items_patch(self, idempotency_key=None, **params):
+    url = self.instance_url() + "/computed_upfront_line_items"
+    headers = util.populate_headers(idempotency_key)
+    self.refresh_from(await self.request("get", url, params, headers))
+    return self
+
 async def list_line_items_patch(self, idempotency_key=None, **params):
     url = self.instance_url() + "/line_items"
     headers = util.populate_headers(idempotency_key)
@@ -76,6 +82,7 @@ async def pdf_patch(
 stripe.Quote.accept = accept_patch
 stripe.Quote.cancel = cancel_patch
 stripe.Quote.finalize_quote = finalize_quote_patch
+stripe.Quote.list_computed_upfront_line_items = list_computed_upfront_line_items_patch
 stripe.Quote.list_line_items = list_line_items_patch
 stripe.Quote._cls_pdf = classmethod(_cls_pdf_patch)
 stripe.Quote.pdf = pdf_patch
@@ -85,6 +92,7 @@ custom_resources = [
     {"name": "accept", "http_verb": "post"},
     {"name": "cancel", "http_verb": "post"},
     {"name": "finalize_quote", "http_verb": "post", "http_path": "finalize"},
+    {"name": "list_computed_upfront_line_items", "http_verb": "get", "http_path": "computed_upfront_line_items"},
     {"name": "list_line_items", "http_verb": "get", "http_path": "line_items"},
 ]
 patch_custom_methods(stripe.Quote, custom_resources)

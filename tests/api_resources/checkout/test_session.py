@@ -40,10 +40,10 @@ class TestSession(object):
         assert isinstance(resource, stripe.checkout.Session)
 
     async def test_checkout_session_expire(self, request_mock):
-        await stripe.checkout.Session.expire("sess_xyz")
+        await stripe.checkout.Session.expire(TEST_RESOURCE_ID)
         request_mock.assert_requested(
             "post",
-            "/v1/checkout/sessions/sess_xyz/expire",
+            "/v1/checkout/sessions/%s/expire" % TEST_RESOURCE_ID,
         )
 
 

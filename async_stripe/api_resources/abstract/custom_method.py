@@ -30,7 +30,14 @@ def _patch(cls, name, http_verb, http_path, is_streaming):
             quote_plus(util.utf8(sid)),
             http_path,
         )
-        return await cls._static_request(http_verb, url, **params)
+        obj = await cls._static_request(http_verb, url, **params)
+
+        # For list objects, we have to attach the parameters so that they
+        # can be referenced in auto-pagination and ensure consistency.
+        if "object" in obj and obj.object == "list":
+            obj._retrieve_params = params
+
+        return obj
 
     async def custom_method_request_stream(cls, sid, **params):
         url = "%s/%s/%s" % (

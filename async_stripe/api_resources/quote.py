@@ -26,14 +26,18 @@ async def finalize_quote_patch(self, idempotency_key=None, **params):
 async def list_computed_upfront_line_items_patch(self, idempotency_key=None, **params):
     url = self.instance_url() + "/computed_upfront_line_items"
     headers = util.populate_headers(idempotency_key)
-    self.refresh_from(await self.request("get", url, params, headers))
-    return self
+    resp = await self.request("get", url, params, headers)
+    stripe_object = util.convert_to_stripe_object(resp)
+    stripe_object._retrieve_params = params
+    return stripe_object
 
 async def list_line_items_patch(self, idempotency_key=None, **params):
     url = self.instance_url() + "/line_items"
     headers = util.populate_headers(idempotency_key)
-    self.refresh_from(await self.request("get", url, params, headers))
-    return self
+    resp = await self.request("get", url, params, headers)
+    stripe_object = util.convert_to_stripe_object(resp)
+    stripe_object._retrieve_params = params
+    return stripe_object
 
 async def _cls_pdf_patch(
     cls,

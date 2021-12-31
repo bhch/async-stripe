@@ -19,9 +19,10 @@ async def delete_discount_patch(self, **params):
 async def list_payment_methods_patch(self, idempotency_key=None, **params):
     url = self.instance_url() + "/payment_methods"
     headers = util.populate_headers(idempotency_key)
-    self.refresh_from(await self.request("get", url, params, headers))
-    return self
-
+    resp = await self.request("get", url, params, headers)
+    stripe_object = util.convert_to_stripe_object(resp)
+    stripe_object._retrieve_params = params
+    return stripe_object
 
 stripe.Customer.delete_discount = delete_discount_patch
 stripe.Customer.list_payment_methods = list_payment_methods_patch

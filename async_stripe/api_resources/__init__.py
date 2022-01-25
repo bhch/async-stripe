@@ -24,6 +24,7 @@ from async_stripe.api_resources import file
 from async_stripe.api_resources import invoice
 from async_stripe.api_resources import order
 from async_stripe.api_resources import payment_intent
+from async_stripe.api_resources import payment_link
 from async_stripe.api_resources import payment_method
 from async_stripe.api_resources import payout
 from async_stripe.api_resources import person

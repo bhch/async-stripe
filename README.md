@@ -1,6 +1,6 @@
 # async-stripe
 
-[![Build Status](https://travis-ci.com/bhch/async-stripe.svg?branch=master)](https://travis-ci.com/bhch/async-stripe)
+[![Build Status](https://app.travis-ci.com/bhch/async-stripe.svg?branch=master)](https://app.travis-ci.com/bhch/async-stripe)
 
 An asynchronous wrapper around Stripe's official python library. 
 

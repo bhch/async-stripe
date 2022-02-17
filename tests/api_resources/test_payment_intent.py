@@ -98,3 +98,10 @@ class TestPaymentIntent(object):
             "post", "/v1/payment_intents/%s/confirm" % TEST_RESOURCE_ID
         )
         assert isinstance(resource, stripe.PaymentIntent)
+
+    async def test_paymentintent_verify_microdeposits(self, request_mock):
+        await stripe.PaymentIntent.verify_microdeposits("pi_xxxxxxxxxxxxx")
+        request_mock.assert_requested(
+            "post",
+            "/v1/payment_intents/pi_xxxxxxxxxxxxx/verify_microdeposits",
+        )

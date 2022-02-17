@@ -81,3 +81,10 @@ class TestSetupIntent(object):
             "post", "/v1/setup_intents/%s/confirm" % TEST_RESOURCE_ID
         )
         assert isinstance(resource, stripe.SetupIntent)
+
+    async def test_setupintent_verify_microdeposits(self, request_mock):
+        await stripe.SetupIntent.verify_microdeposits("seti_xxxxxxxxxxxxx")
+        request_mock.assert_requested(
+            "post",
+            "/v1/setup_intents/seti_xxxxxxxxxxxxx/verify_microdeposits",
+        )

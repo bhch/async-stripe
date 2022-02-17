@@ -24,14 +24,23 @@ async def confirm_patch(self, idempotency_key=None, **params):
     return self
 
 
+async def verify_microdeposits_patch(self, idempotency_key=None, **params):
+    url = self.instance_url() + "/verify_microdeposits"
+    headers = util.populate_headers(idempotency_key)
+    self.refresh_from(await self.request("post", url, params, headers))
+    return self
+
+
 stripe.PaymentIntent.cancel = cancel_patch
 stripe.PaymentIntent.capture = capture_patch
 stripe.PaymentIntent.confirm = confirm_patch
+stripe.PaymentIntent.verify_microdeposits = verify_microdeposits_patch
 
 
 custom_resources = [
     {"name": "cancel", "http_verb": "post"},
     {"name": "capture", "http_verb": "post"},
     {"name": "confirm", "http_verb": "post"},
+    {"name": "verify_microdeposits", "http_verb": "post"},
 ]
 patch_custom_methods(stripe.PaymentIntent, custom_resources)

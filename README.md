@@ -13,7 +13,8 @@ Monkey-patching allows us to avoid a complete rewrite and keep the usage api
 similar to the official library.
 
 This **doesn't use threads**, but **actual async coroutines** and 
-[non-blocking http client][1] to make requests.
+[non-blocking http client][1] to make requests. Hence, the performance is much
+better than other wrapper libraries which use threading.
 
 ## Install
 

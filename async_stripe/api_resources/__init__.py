@@ -28,6 +28,7 @@ from async_stripe.api_resources import payment_link
 from async_stripe.api_resources import payment_method
 from async_stripe.api_resources import payout
 from async_stripe.api_resources import person
+from async_stripe.api_resources import quote
 from async_stripe.api_resources import reversal
 from async_stripe.api_resources import review
 from async_stripe.api_resources import setup_intent
@@ -37,5 +38,5 @@ from async_stripe.api_resources import subscription_item
 from async_stripe.api_resources import subscription_schedule
 from async_stripe.api_resources import topup
 from async_stripe.api_resources import transfer
+from async_stripe.api_resources import test_helpers
 from async_stripe.api_resources import usage_record
-from async_stripe.api_resources import quote

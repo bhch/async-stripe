@@ -14,6 +14,9 @@ from async_stripe.api_resources.abstract.deletable_api_resource import (
 from async_stripe.api_resources.abstract.listable_api_resource import (
     ListableAPIResource,
 )
+from async_stripe.api_resources.abstract.searchable_api_resource import (
+    SearchableAPIResource,
+)
 
 from async_stripe.api_resources.abstract.nested_resource_class_methods import (
     patch_nested_resources

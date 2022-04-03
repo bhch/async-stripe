@@ -25,6 +25,22 @@ class TestPrice(object):
         )
         assert isinstance(resource, stripe.Price)
 
+    async def test_is_searchable(self, request_mock):
+        resources = await stripe.Price.search(query='currency:"USD"')
+        request_mock.assert_requested(
+            "get", "/v1/prices/search", {"query": 'currency:"USD"'}
+        )
+        assert resources.total_count == 1
+        assert isinstance(resources.data, list)
+        assert isinstance(resources.data[0], stripe.Price)
+
+        cnt = 0
+        async for c in resources.auto_paging_iter():
+            assert isinstance(c, stripe.Price)
+            cnt += 1
+
+        assert cnt == 1
+
     async def test_is_creatable(self, request_mock):
         resource = await stripe.Price.create(
             unit_amount=1000,

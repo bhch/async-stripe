@@ -24,6 +24,22 @@ class TestSubscription(object):
         )
         assert isinstance(resource, stripe.Subscription)
 
+    async def test_is_searchable(self, request_mock):
+        resources = await stripe.Subscription.search(query='currency:"USD"')
+        request_mock.assert_requested(
+            "get", "/v1/subscriptions/search", {"query": 'currency:"USD"'}
+        )
+        assert resources.total_count == 1
+        assert isinstance(resources.data, list)
+        assert isinstance(resources.data[0], stripe.Subscription)
+
+        cnt = 0
+        async for c in resources.auto_paging_iter():
+            assert isinstance(c, stripe.Subscription)
+            cnt += 1
+
+        assert cnt == 1
+
     async def test_is_creatable(self, request_mock):
         resource = await stripe.Subscription.create(customer="cus_123")
         request_mock.assert_requested("post", "/v1/subscriptions")

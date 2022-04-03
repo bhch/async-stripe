@@ -24,6 +24,22 @@ class TestPaymentIntent(object):
         )
         assert isinstance(resource, stripe.PaymentIntent)
 
+    async def test_is_searchable(self, request_mock):
+        resources = await stripe.PaymentIntent.search(query='currency:"USD"')
+        request_mock.assert_requested(
+            "get", "/v1/payment_intents/search", {"query": 'currency:"USD"'}
+        )
+        assert resources.total_count == 1
+        assert isinstance(resources.data, list)
+        assert isinstance(resources.data[0], stripe.PaymentIntent)
+
+        cnt = 0
+        async for c in resources.auto_paging_iter():
+            assert isinstance(c, stripe.PaymentIntent)
+            cnt += 1
+
+        assert cnt == 1
+
     async def test_is_creatable(self, request_mock):
         resource = await stripe.PaymentIntent.create(
             amount="1234", currency="amount", payment_method_types=["card"]

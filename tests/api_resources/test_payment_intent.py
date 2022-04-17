@@ -121,3 +121,10 @@ class TestPaymentIntent(object):
             "post",
             "/v1/payment_intents/pi_xxxxxxxxxxxxx/verify_microdeposits",
         )
+
+    async def test_paymentintent_apply_customer_balance(self, request_mock):
+        await stripe.PaymentIntent.apply_customer_balance("pi_xxxxxxxxxxxxx")
+        request_mock.assert_requested(
+            "post",
+            "/v1/payment_intents/pi_xxxxxxxxxxxxx/apply_customer_balance"
+        )

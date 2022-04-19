@@ -128,3 +128,10 @@ class TestPaymentIntent(object):
             "post",
             "/v1/payment_intents/pi_xxxxxxxxxxxxx/apply_customer_balance"
         )
+
+    async def test_paymentintent_increment_authorization(self, request_mock):
+        await stripe.PaymentIntent.increment_authorization("pi_xxxxxxxxxxxxx", amount=100)
+        request_mock.assert_requested(
+            "post",
+            "/v1/payment_intents/pi_xxxxxxxxxxxxx/increment_authorization"
+        )

@@ -209,3 +209,20 @@ class TestCustomerPaymentMethods(object):
             "get", "/v1/customers/%s/payment_methods" % TEST_RESOURCE_ID
         )
         assert isinstance(resource, stripe.ListObject)
+
+
+class TestCustomerFundingInstructions(object):
+    async def test_customer_create_funding_instructions(self, request_mock):
+        await stripe.Customer.create_funding_instructions(
+            "cus_123",
+            bank_transfer={
+                "requested_address_types": ["zengin"],
+                "type": "jp_bank_transfer",
+            },
+            currency="usd",
+            funding_type="bank_transfer",
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/customers/cus_123/funding_instructions",
+        )

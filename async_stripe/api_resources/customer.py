@@ -24,6 +24,14 @@ async def list_payment_methods_patch(self, idempotency_key=None, **params):
     stripe_object._retrieve_params = params
     return stripe_object
 
+async def create_funding_instructions_patch(self, idempotency_key=None, **params):
+    url = self.instance_url() + "/funding_instructions"
+    headers = util.populate_headers(idempotency_key)
+    resp = await self.request("post", url, params, headers)
+    stripe_object = util.convert_to_stripe_object(resp)
+    return stripe_object
+
+
 stripe.Customer.delete_discount = delete_discount_patch
 stripe.Customer.list_payment_methods = list_payment_methods_patch
 
@@ -36,5 +44,6 @@ patch_nested_resources(stripe.Customer, netsted_resources)
 custom_resources = [
     {"name": "delete_discount", "http_verb": "delete", "http_path": "discount"},
     {"name": "list_payment_methods", "http_verb": "get", "http_path": "payment_methods"},
+    {"name": "create_funding_instructions", "http_verb": "post", "http_path": "funding_instructions"},
 ]
 patch_custom_methods(stripe.Customer, custom_resources)

@@ -32,6 +32,7 @@ from async_stripe.api_resources import person
 from async_stripe.api_resources import quote
 from async_stripe.api_resources import reversal
 from async_stripe.api_resources import review
+from async_stripe.api_resources import refund
 from async_stripe.api_resources import setup_intent
 from async_stripe.api_resources import source
 from async_stripe.api_resources import subscription

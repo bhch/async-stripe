@@ -36,7 +36,7 @@ stripe.Customer.delete_discount = delete_discount_patch
 stripe.Customer.list_payment_methods = list_payment_methods_patch
 
 
-netsted_resources = ['balance_transaction', 'source', 'tax_id']
+netsted_resources = ['balance_transaction', 'source', 'tax_id', 'cash_balance']
 patch_nested_resources(stripe.Customer, netsted_resources)
 
 

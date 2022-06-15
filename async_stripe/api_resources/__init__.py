@@ -3,7 +3,9 @@ from async_stripe.api_resources.abstract import *
 from async_stripe.api_resources import list_object
 from async_stripe.api_resources import search_result_object
 
-from async_stripe.api_resources import checkout 
+from async_stripe.api_resources import checkout
+
+from async_stripe.api_resources import financial_connections
 
 from async_stripe.api_resources import identity
 

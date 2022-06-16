@@ -42,6 +42,14 @@ from async_stripe.api_resources import subscription_item
 from async_stripe.api_resources import subscription_schedule
 from async_stripe.api_resources import topup
 from async_stripe.api_resources import transfer
-from async_stripe.api_resources import test_helpers
 from async_stripe.api_resources import terminal
 from async_stripe.api_resources import usage_record
+
+
+# For some strange reason writing: 
+# fromm async_stripe.api_resources import test_helpers
+# doesn't work while running tests.
+# It seems like this is an issue with pytest
+# probably because name of the module starts with "test_".
+# Rewriting the import statement like below seems to work fine
+import async_stripe.api_resources.test_helpers

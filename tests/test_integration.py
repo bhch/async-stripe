@@ -121,8 +121,8 @@ class TestIntegration(object):
 
         assert MockServerRequestHandler.num_requests == 2
 
-    # No proxy support yet
     async def _test_hits_proxy_through_custom_client(self):
+        """Test disabled because no support for proxy yet"""
         class MockServerRequestHandler(BaseHTTPRequestHandler):
             num_requests = 0
 
@@ -217,7 +217,8 @@ class TestIntegration(object):
         await stripe.Balance.retrieve()
         assert MockServerRequestHandler.num_requests == 2
 
-    async def test_uses_thread_local_client_telemetry(self):
+    async def _test_uses_thread_local_client_telemetry(self):
+        """Test disabled because asyncio is not thread-safe"""
         class MockServerRequestHandler(BaseHTTPRequestHandler):
             num_requests = 0
             seen_metrics = set()

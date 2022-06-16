@@ -9,7 +9,7 @@ async def disconnect_patch(self, idempotency_key=None, **params):
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
-async def refresh_patch(self, idempotency_key=None, **params):
+async def refresh_account_patch(self, idempotency_key=None, **params):
     url = self.instance_url() + "/refresh"
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
@@ -17,11 +17,11 @@ async def refresh_patch(self, idempotency_key=None, **params):
 
 
 stripe.financial_connections.Account.disconnect = disconnect_patch
-stripe.financial_connections.Account.refresh = refresh_patch
+stripe.financial_connections.Account.refresh_account= refresh_account_patch
 
 
 custom_resources = [
     {"name": "disconnect", "http_verb": "post", "http_path": "disconnect"},
-    {"name": "refresh", "http_verb": "post", "http_path": "refresh"},
+    {"name": "refresh_account", "http_verb": "post", "http_path": "refresh"},
 ]
 patch_custom_methods(stripe.financial_connections.Account, custom_resources)

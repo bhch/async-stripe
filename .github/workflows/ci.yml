@@ -45,4 +45,4 @@ jobs:
         run: docker run -d -p 12111-12112:12111-12112 stripe/stripe-mock && sleep 5
 
       - name: Test with pytest
-        run: make test-gh-actions
+        run: pytest

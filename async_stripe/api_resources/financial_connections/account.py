@@ -15,13 +15,23 @@ async def refresh_account_patch(self, idempotency_key=None, **params):
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
+async def list_owners_patch(self, idempotency_key=None, **params):
+    url = self.instance_url() + "/owners"
+    headers = util.populate_headers(idempotency_key)
+    resp = await self.request("get", url, params, headers)
+    stripe_object = util.convert_to_stripe_object(resp)
+    stripe_object._retrieve_params = params
+    return stripe_object
+
 
 stripe.financial_connections.Account.disconnect = disconnect_patch
 stripe.financial_connections.Account.refresh_account= refresh_account_patch
+stripe.financial_connections.Account.list_owners = list_owners_patch
 
 
 custom_resources = [
     {"name": "disconnect", "http_verb": "post", "http_path": "disconnect"},
     {"name": "refresh_account", "http_verb": "post", "http_path": "refresh"},
+    {"name": "list_owners", "http_verb": "get", "http_path": "owners"},
 ]
 patch_custom_methods(stripe.financial_connections.Account, custom_resources)

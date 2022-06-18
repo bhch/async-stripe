@@ -43,6 +43,7 @@ from async_stripe.api_resources import subscription_schedule
 from async_stripe.api_resources import topup
 from async_stripe.api_resources import transfer
 from async_stripe.api_resources import terminal
+from async_stripe.api_resources import treasury
 from async_stripe.api_resources import usage_record
 
 

@@ -8,6 +8,24 @@ pytestmark = pytest.mark.asyncio
 
 
 class TestGeneratedExamples:
+    async def test_apps_secret_create(self, request_mock):
+        await stripe.apps.Secret.create(
+            name="sec_123",
+            payload="very secret string",
+            scope={"type": "account"},
+        )
+        request_mock.assert_requested("post", "/v1/apps/secrets")
+
+    async def test_apps_secret_find(self, request_mock):
+        await stripe.apps.Secret.find(name="sec_123", scope={"type": "account"})
+        request_mock.assert_requested("get", "/v1/apps/secrets/find")
+
+    async def test_apps_secret_delete_where(self, request_mock):
+        await stripe.apps.Secret.delete_where(
+            name="sec_123", scope={"type": "account"}
+        )
+        request_mock.assert_requested("post", "/v1/apps/secrets/delete")
+
     async def test_customer_list_payment_methods(self, request_mock):
         await stripe.Customer.list_payment_methods("cus_xyz", type="card")
         request_mock.assert_requested(

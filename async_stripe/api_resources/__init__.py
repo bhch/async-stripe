@@ -11,10 +11,12 @@ from async_stripe.api_resources import identity
 
 from async_stripe.api_resources import issuing
 
+
 from async_stripe.api_resources import account
 from async_stripe.api_resources import alipay_account
 from async_stripe.api_resources import application_fee
 from async_stripe.api_resources import application_fee_refund
+from async_stripe.api_resources import apps
 from async_stripe.api_resources import bank_account
 from async_stripe.api_resources import capability
 from async_stripe.api_resources import card

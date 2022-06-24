@@ -33,6 +33,21 @@ class TestGeneratedExamples:
             "/v1/customers/cus_xyz/payment_methods",
         )
 
+    async def test_customer_cashbalance_retrieve(self, request_mock):
+        await stripe.Customer.retrieve_cash_balance("cus_123")
+        request_mock.assert_requested(
+            "get", "/v1/customers/cus_123/cash_balance"
+        )
+
+    async def test_customer_cashbalance_update(self, request_mock):
+        await stripe.Customer.modify_cash_balance(
+            "cus_123",
+            settings={"reconciliation_mode": "manual"},
+        )
+        request_mock.assert_requested(
+            "post", "/v1/customers/cus_123/cash_balance"
+        )
+
     async def test_checkout_session_expire(self, request_mock):
         await stripe.checkout.Session.expire("sess_xyz")
         request_mock.assert_requested(

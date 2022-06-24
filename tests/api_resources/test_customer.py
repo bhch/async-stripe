@@ -226,3 +226,42 @@ class TestCustomerFundingInstructions(object):
             "post",
             "/v1/customers/cus_123/funding_instructions",
         )
+
+
+class TestCustomerCashBalanceMethods(object):
+    # These tests are present for compatibility purposes. Previously the cash
+    # balance methods required None as a second nested_id parameter. The method
+    # has been patched to no longer require this, but we want to preserve
+    # compatibility for existing users.
+    async def test_customer_cashbalance_retrieve_legacy_call_pattern(
+        self, request_mock
+    ):
+        await stripe.Customer.retrieve_cash_balance("cus_123", None)
+        request_mock.assert_requested(
+            "get", "/v1/customers/cus_123/cash_balance"
+        )
+
+    async def test_customer_cashbalance_modify_legacy_call_pattern(
+        self, request_mock
+    ):
+        await stripe.Customer.modify_cash_balance(
+            "cus_123",
+            None,
+            settings={"reconciliation_mode": "manual"},
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/customers/cus_123/cash_balance",
+            {"settings": {"reconciliation_mode": "manual"}},
+        )
+
+    async def test_customer_cashbalance_modify_fixed_pattern(self, request_mock):
+        await stripe.Customer.modify_cash_balance(
+            "cus_123",
+            settings={"reconciliation_mode": "manual"},
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/customers/cus_123/cash_balance",
+            {"settings": {"reconciliation_mode": "manual"}},
+        )

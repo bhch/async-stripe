@@ -69,14 +69,58 @@ async def retrieve_payment_method_patch(
     stripe_object = util.convert_to_stripe_object(resp)
     return stripe_object
 
+async def retrieve_cash_balance_patch(
+    cls,
+    customer,
+    nested_id=None,
+    api_key=None,
+    stripe_version=None,
+    stripe_account=None,
+    **params
+):
+    # The nested_id parameter is required for backwards compatibility purposes and is ignored.
+    requestor = api_requestor.APIRequestor(
+        api_key, api_version=stripe_version, account=stripe_account
+    )
+    url = "/v1/customers/{customer}/cash_balance".format(
+        customer=util.sanitize_id(customer)
+    )
+    response, api_key = await requestor.request("get", url, params)
+    return util.convert_to_stripe_object(
+        response, api_key, stripe_version, stripe_account
+    )
+
+async def modify_cash_balance_patch(
+    cls,
+    customer,
+    nested_id=None,
+    api_key=None,
+    stripe_version=None,
+    stripe_account=None,
+    **params
+):
+    # The nested_id parameter is required for backwards compatibility purposes and is ignored.
+    requestor = api_requestor.APIRequestor(
+        api_key, api_version=stripe_version, account=stripe_account
+    )
+    url = "/v1/customers/{customer}/cash_balance".format(
+        customer=util.sanitize_id(customer)
+    )
+    response, api_key = await requestor.request("post", url, params)
+    return util.convert_to_stripe_object(
+        response, api_key, stripe_version, stripe_account
+    )
+
 
 stripe.Customer.delete_discount = delete_discount_patch
 stripe.Customer.list_payment_methods = list_payment_methods_patch
 stripe.Customer._cls_retrieve_payment_method = classmethod(_cls_retrieve_payment_method_patch)
 stripe.Customer.retrieve_payment_method = retrieve_payment_method_patch
+stripe.Customer.retrieve_cash_balance = classmethod(retrieve_cash_balance_patch)
+stripe.Customer.modify_cash_balance = classmethod(modify_cash_balance_patch)
 
 
-netsted_resources = ['balance_transaction', 'source', 'tax_id', 'cash_balance']
+netsted_resources = ['balance_transaction', 'source', 'tax_id']
 patch_nested_resources(stripe.Customer, netsted_resources)
 
 

@@ -25,8 +25,13 @@ async def modify_patch(cls, id=None, **params):
     return await cls._static_request("post", url, **params)
 
 
-async def persons_patch(self, **params):
-    return await self.request("get", self.instance_url() + "/persons", params)
+async def persons_patch(self, idempotency_key=None, **params):
+    url = self.instance_url() + "/persons"
+    headers = util.populate_headers(idempotency_key)
+    resp = await self.request("get", url, params, headers)
+    stripe_object = util.convert_to_stripe_object(resp)
+    stripe_object._retrieve_params = params
+    return stripe_object
 
 
 async def deauthorize_patch(self, **params):
@@ -63,6 +68,7 @@ patch_nested_resources(stripe.Account, nested_resources)
 
 custom_methods = [
     {"name": "reject", "http_verb": "post"},
+    {"name": "persons", "http_verb": "get"},
 ]
 
 patch_custom_methods(stripe.Account, custom_methods)

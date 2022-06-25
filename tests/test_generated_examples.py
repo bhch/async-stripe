@@ -48,6 +48,17 @@ class TestGeneratedExamples:
             "post", "/v1/customers/cus_123/cash_balance"
         )
 
+    async def test_customer_fund_cash_balance(self, request_mock):
+        await stripe.Customer.TestHelpers.fund_cash_balance(
+            "cus_123",
+            amount=30,
+            currency="eur",
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/test_helpers/customers/cus_123/fund_cash_balance",
+        )
+
     async def test_checkout_session_expire(self, request_mock):
         await stripe.checkout.Session.expire("sess_xyz")
         request_mock.assert_requested(

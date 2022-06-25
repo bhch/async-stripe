@@ -131,3 +131,23 @@ custom_resources = [
     {"name": "create_funding_instructions", "http_verb": "post", "http_path": "funding_instructions"},
 ]
 patch_custom_methods(stripe.Customer, custom_resources)
+
+
+# methods for TestHelpers nested class
+
+async def fund_cash_balance_patch(self, idempotency_key=None, **params):
+    url = self.instance_url() + "/fund_cash_balance"
+    headers = util.populate_headers(idempotency_key)
+    self.resource.refresh_from(
+        await self.resource.request("post", url, params, headers)
+    )
+    return self.resource
+
+
+stripe.Customer.TestHelpers.fund_cash_balance = fund_cash_balance_patch
+
+
+TestHelpers_custom_resources = [
+    {"name": "fund_cash_balance", "http_verb": "post"}
+]
+patch_custom_methods(stripe.Customer.TestHelpers, TestHelpers_custom_resources)

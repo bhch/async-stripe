@@ -6,25 +6,33 @@ from async_stripe.api_resources.abstract import patch_custom_methods
 
 
 async def accept_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/accept"
+    url = "/v1/quotes/{quote}/accept".format(
+        quote=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
 async def cancel_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/cancel"
+    url = "/v1/quotes/{quote}/cancel".format(
+        quote=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
 async def finalize_quote_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/finalize"
+    url = "/v1/quotes/{quote}/finalize".format(
+        quote=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
 async def list_computed_upfront_line_items_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/computed_upfront_line_items"
+    url = "/v1/quotes/{quote}/computed_upfront_line_items".format(
+        quote=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     resp = await self.request("get", url, params, headers)
     stripe_object = util.convert_to_stripe_object(resp)
@@ -32,7 +40,9 @@ async def list_computed_upfront_line_items_patch(self, idempotency_key=None, **p
     return stripe_object
 
 async def list_line_items_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/line_items"
+    url = "/v1/quotes/{quote}/line_items".format(
+        quote=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     resp = await self.request("get", url, params, headers)
     stripe_object = util.convert_to_stripe_object(resp)

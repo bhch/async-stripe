@@ -9,22 +9,18 @@ async def pay_patch(self, idempotency_key=None, **params):
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
-
-async def return_order_patch(self, idempotency_key=None, **params):
-    headers = util.populate_headers(idempotency_key)
-    return await self.request(
-        "post", self.instance_url() + "/returns", params, headers
-    )
-
-
 async def cancel_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/cancel"
+    url = "/v1/orders/{id}/cancel".format(
+        id=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
 async def list_line_items_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/line_items"
+    url = "/v1/orders/{id}/line_items".format(
+        id=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     resp = await self.request("get", url, params, headers)
     stripe_object = util.convert_to_stripe_object(resp)
@@ -32,13 +28,17 @@ async def list_line_items_patch(self, idempotency_key=None, **params):
     return stripe_object
 
 async def reopen_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/reopen"
+    url = "/v1/orders/{id}/reopen".format(
+        id=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
 async def submit_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/submit"
+    url = "/v1/orders/{id}/submit".format(
+        id=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self

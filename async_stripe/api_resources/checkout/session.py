@@ -4,7 +4,9 @@ from async_stripe.api_resources.abstract import patch_custom_methods, patch_nest
 
 
 async def expire_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/expire"
+    url = "/v1/checkout/sessions/{session}/expire".format(
+        session=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self

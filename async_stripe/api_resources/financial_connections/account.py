@@ -4,19 +4,25 @@ from stripe import util
 
 
 async def disconnect_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/disconnect"
+    url = "/v1/financial_connections/accounts/{account}/disconnect".format(
+        account=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
 async def refresh_account_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/refresh"
+    url = "/v1/financial_connections/accounts/{account}/refresh".format(
+        account=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
 async def list_owners_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/owners"
+    url = "/v1/financial_connections/accounts/{account}/owners".format(
+        account=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     resp = await self.request("get", url, params, headers)
     stripe_object = util.convert_to_stripe_object(resp)

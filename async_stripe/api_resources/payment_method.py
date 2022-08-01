@@ -4,14 +4,18 @@ from async_stripe.api_resources.abstract import patch_custom_methods
 
 
 async def attach_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/attach"
+    url = "/v1/payment_methods/{payment_method}/attach".format(
+        payment_method=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
 
 async def detach_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/detach"
+    url = "/v1/payment_methods/{payment_method}/detach".format(
+        payment_method=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self

@@ -17,7 +17,9 @@ async def delete_discount_patch(self, **params):
     self.refresh_from({"discount": None}, api_key, True)
 
 async def list_payment_methods_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/payment_methods"
+    url = "/v1/customers/{customer}/payment_methods".format(
+        customer=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     resp = await self.request("get", url, params, headers)
     stripe_object = util.convert_to_stripe_object(resp)
@@ -25,7 +27,9 @@ async def list_payment_methods_patch(self, idempotency_key=None, **params):
     return stripe_object
 
 async def create_funding_instructions_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/funding_instructions"
+    url = "/v1/customers/{customer}/funding_instructions".format(
+        customer=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     resp = await self.request("post", url, params, headers)
     stripe_object = util.convert_to_stripe_object(resp)
@@ -134,9 +138,31 @@ patch_custom_methods(stripe.Customer, custom_resources)
 
 
 # methods for TestHelpers nested class
+async def TestHelpers__cls_fund_cash_balance_patch(
+    cls,
+    customer,
+    api_key=None,
+    stripe_version=None,
+    stripe_account=None,
+    **params
+):
+    requestor = api_requestor.APIRequestor(
+        api_key, api_version=stripe_version, account=stripe_account
+    )
+    url = "/v1/test_helpers/customers/{customer}/fund_cash_balance".format(
+        customer=util.sanitize_id(customer)
+    )
+    response, api_key = await requestor.request("post", url, params)
+    stripe_object = util.convert_to_stripe_object(
+        response, api_key, stripe_version, stripe_account
+    )
+    return stripe_object
 
-async def fund_cash_balance_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/fund_cash_balance"
+@util.class_method_variant("_cls_fund_cash_balance")
+async def TestHelpers_fund_cash_balance_patch(self, idempotency_key=None, **params):
+    url = "/v1/test_helpers/customers/{customer}/fund_cash_balance".format(
+        customer=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.resource.refresh_from(
         await self.resource.request("post", url, params, headers)
@@ -144,10 +170,5 @@ async def fund_cash_balance_patch(self, idempotency_key=None, **params):
     return self.resource
 
 
-stripe.Customer.TestHelpers.fund_cash_balance = fund_cash_balance_patch
-
-
-TestHelpers_custom_resources = [
-    {"name": "fund_cash_balance", "http_verb": "post"}
-]
-patch_custom_methods(stripe.Customer.TestHelpers, TestHelpers_custom_resources)
+stripe.Customer.TestHelpers._cls_fund_cash_balance = classmethod(TestHelpers__cls_fund_cash_balance_patch)
+stripe.Customer.TestHelpers.fund_cash_balance = TestHelpers_fund_cash_balance_patch

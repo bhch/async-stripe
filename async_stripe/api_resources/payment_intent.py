@@ -4,42 +4,54 @@ from async_stripe.api_resources.abstract import patch_custom_methods
 
 
 async def cancel_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/cancel"
+    url = "/v1/payment_intents/{intent}/cancel".format(
+        intent=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
 
 async def capture_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/capture"
+    url = "/v1/payment_intents/{intent}/capture".format(
+        intent=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
 
 async def confirm_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/confirm"
+    url = "/v1/payment_intents/{intent}/confirm".format(
+        intent=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
 
 async def verify_microdeposits_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/verify_microdeposits"
+    url = "/v1/payment_intents/{intent}/verify_microdeposits".format(
+        intent=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
 
 async def apply_customer_balance_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/apply_customer_balance"
+    url = "/v1/payment_intents/{intent}/apply_customer_balance".format(
+        intent=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
 
 async def increment_authorization_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/increment_authorization"
+    url = "/v1/payment_intents/{intent}/increment_authorization".format(
+        intent=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self

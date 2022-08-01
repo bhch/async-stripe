@@ -4,14 +4,18 @@ from async_stripe.api_resources.abstract import patch_custom_methods
 
 
 async def approve_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/approve"
+    url = "/v1/issuing/authorizations/{authorization}/approve".format(
+        authorization=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self
 
 
 async def decline_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/decline"
+    url = "/v1/issuing/authorizations/{authorization}/decline".format(
+        authorization=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self

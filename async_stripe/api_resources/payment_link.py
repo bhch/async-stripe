@@ -4,7 +4,9 @@ from async_stripe.api_resources.abstract import patch_custom_methods
 
 
 async def list_line_items_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/line_items"
+    url = "/v1/payment_links/{payment_link}/line_items".format(
+        payment_link=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     resp = await self.request("get", url, params, headers)
     stripe_object = util.convert_to_stripe_object(resp)

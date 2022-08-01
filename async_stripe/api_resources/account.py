@@ -8,7 +8,9 @@ from async_stripe.api_resources.abstract import (
 
 
 async def reject_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/reject"
+    url = "/v1/accounts/{account}/reject".format(
+        account=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     self.refresh_from(await self.request("post", url, params, headers))
     return self
@@ -26,7 +28,9 @@ async def modify_patch(cls, id=None, **params):
 
 
 async def persons_patch(self, idempotency_key=None, **params):
-    url = self.instance_url() + "/persons"
+    url = "/v1/accounts/{account}/persons".format(
+        account=util.sanitize_id(self.get("id"))
+    )
     headers = util.populate_headers(idempotency_key)
     resp = await self.request("get", url, params, headers)
     stripe_object = util.convert_to_stripe_object(resp)

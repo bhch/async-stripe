@@ -60,7 +60,7 @@ jobs:
       # not fully supported by github actions yet, as of Feb 2021
       # https://github.com/actions/cache/issues/81
       - name: Start stripe-mock
-        run: docker run -d -p 12111-12112:12111-12112 stripe/stripe-mock && sleep 5
+        run: docker run -d -p 12111-12112:12111-12112 stripe/stripe-mock:v0.140.0 && sleep 5
       #----------------------------------------------
       #    add matrix specifics and run test suite
       #----------------------------------------------

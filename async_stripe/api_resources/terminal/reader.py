@@ -1,5 +1,6 @@
 import stripe
 from stripe import util
+from stripe import api_requestor
 from async_stripe.api_resources.abstract import patch_custom_methods
 
 
@@ -52,7 +53,7 @@ patch_custom_methods(stripe.terminal.Reader, custom_resources)
 
 
 # methods for TestHelpers class (nested inside Reader class)
-async def TestHelpers__cls_present_payment_method(
+async def TestHelpers__cls_present_payment_method_patch(
     cls,
     reader,
     api_key=None,
@@ -66,9 +67,9 @@ async def TestHelpers__cls_present_payment_method(
     url = "/v1/test_helpers/terminal/readers/{reader}/present_payment_method".format(
         reader=util.sanitize_id(reader)
     )
-    response, api_key = requestor.request("post", url, params)
+    response, api_key = await requestor.request("post", url, params)
     stripe_object = util.convert_to_stripe_object(
-        await response, api_key, stripe_version, stripe_account
+        response, api_key, stripe_version, stripe_account
     )
     return stripe_object
 
@@ -84,5 +85,5 @@ async def TestHelpers_present_payment_method_patch(self, idempotency_key=None, *
     return self.resource
 
 
-stripe.terminal.Reader.TestHelpers.present_payment_method = classmethod(TestHelpers__cls_present_payment_method)
+stripe.terminal.Reader.TestHelpers._cls_present_payment_method = classmethod(TestHelpers__cls_present_payment_method_patch)
 stripe.terminal.Reader.TestHelpers.present_payment_method = TestHelpers_present_payment_method_patch

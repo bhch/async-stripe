@@ -79,7 +79,7 @@ async def TestHelpers__cls_return_inbound_transfer_patch(
     stripe_object = util.convert_to_stripe_object(
         response, api_key, stripe_version, stripe_account
     )
-    return stripe_objec
+    return stripe_object
 
 @util.class_method_variant("_cls_return_inbound_transfer")
 async def TestHelpers_return_inbound_transfer_patch(self, idempotency_key=None, **params):
@@ -124,9 +124,9 @@ async def TestHelpers_succeed_patch(self, idempotency_key=None, **params):
     return self.resource
 
 
-stripe.treasury.InboundTransfer.TestHelpers._cls_fail_patch = classmethod(TestHelpers__cls_fail_patch)
+stripe.treasury.InboundTransfer.TestHelpers._cls_fail = classmethod(TestHelpers__cls_fail_patch)
 stripe.treasury.InboundTransfer.TestHelpers.fail = TestHelpers_fail_patch
-stripe.treasury.InboundTransfer.TestHelpers._cls_return_inbound_transfer_patch = classmethod(TestHelpers__cls_return_inbound_transfer_patch)
+stripe.treasury.InboundTransfer.TestHelpers._cls_return_inbound_transfer = classmethod(TestHelpers__cls_return_inbound_transfer_patch)
 stripe.treasury.InboundTransfer.TestHelpers.return_inbound_transfer = TestHelpers_return_inbound_transfer_patch
-stripe.treasury.InboundTransfer.TestHelpers._cls_succeed_patch = classmethod(TestHelpers__cls_succeed_patch)
+stripe.treasury.InboundTransfer.TestHelpers._cls_succeed = classmethod(TestHelpers__cls_succeed_patch)
 stripe.treasury.InboundTransfer.TestHelpers.succeed = TestHelpers_succeed_patch

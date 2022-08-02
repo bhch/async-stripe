@@ -50,10 +50,10 @@ async def TestHelpers_expire_patch(self, idempotency_key=None, **params):
     )
     headers = util.populate_headers(idempotency_key)
     self.resource.refresh_from(
-        self.resource.request("post", url, params, headers)
+        await self.resource.request("post", url, params, headers)
     )
     return self.resource
 
 
-stripe.Refund.TestHelpers._cls_expire_patch = classmethod(TestHelpers__cls_expire_patch)
+stripe.Refund.TestHelpers._cls_expire = classmethod(TestHelpers__cls_expire_patch)
 stripe.Refund.TestHelpers.expire = TestHelpers_expire_patch

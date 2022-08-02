@@ -121,5 +121,5 @@ stripe.treasury.OutboundTransfer.TestHelpers._cls_fail = classmethod(TestHelpers
 stripe.treasury.OutboundTransfer.TestHelpers.fail = TestHelpers_fail_patch
 stripe.treasury.OutboundTransfer.TestHelpers._cls_post = classmethod(TestHelpers__cls_post_patch)
 stripe.treasury.OutboundTransfer.TestHelpers.post = TestHelpers_post_patch
-stripe.treasury.OutboundTransfer.TestHelpers._cls_return_outbound_transfer_patch = classmethod(TestHelpers__cls_return_outbound_transfer_patch)
+stripe.treasury.OutboundTransfer.TestHelpers._cls_return_outbound_transfer = classmethod(TestHelpers__cls_return_outbound_transfer_patch)
 stripe.treasury.OutboundTransfer.TestHelpers.return_outbound_transfer = TestHelpers_return_outbound_transfer_patch

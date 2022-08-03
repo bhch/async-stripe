@@ -64,14 +64,6 @@ class TestCharge(object):
         )
         assert isinstance(resource, stripe.Charge)
 
-    async def test_is_refundable(self, request_mock):
-        charge = await stripe.Charge.retrieve(TEST_RESOURCE_ID)
-        resource = await charge.refund()
-        request_mock.assert_requested(
-            "post", "/v1/charges/%s/refund" % TEST_RESOURCE_ID
-        )
-        assert isinstance(resource, stripe.Charge)
-
     async def test_can_capture(self, request_mock):
         charge = await stripe.Charge.retrieve(TEST_RESOURCE_ID)
         resource = await charge.capture()
@@ -86,22 +78,6 @@ class TestCharge(object):
             "post", "/v1/charges/%s/capture" % TEST_RESOURCE_ID
         )
         assert isinstance(resource, stripe.Charge)
-
-    async def test_can_update_dispute(self, request_mock):
-        charge = await stripe.Charge.retrieve(TEST_RESOURCE_ID)
-        resource = await charge.update_dispute()
-        request_mock.assert_requested(
-            "post", "/v1/charges/%s/dispute" % charge.id
-        )
-        assert isinstance(resource, stripe.Dispute)
-
-    async def test_can_close_dispute(self, request_mock):
-        charge = await stripe.Charge.retrieve(TEST_RESOURCE_ID)
-        resource = await charge.close_dispute()
-        request_mock.assert_requested(
-            "post", "/v1/charges/%s/dispute/close" % charge.id
-        )
-        assert isinstance(resource, stripe.Dispute)
 
     async def test_can_mark_as_fraudulent(self, request_mock):
         charge = await stripe.Charge.retrieve(TEST_RESOURCE_ID)

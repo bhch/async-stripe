@@ -1,5 +1,4 @@
-from stripe import util
-from stripe import api_requestor
+from stripe.api_resources.abstract import APIResource
 
 
 def patch_nested_resources(cls, nested_resources):
@@ -16,13 +15,14 @@ def patch_nested_resources(cls, nested_resources):
             stripe_account=None,
             **params
         ):
-            requestor = api_requestor.APIRequestor(
-                api_key, api_version=stripe_version, account=stripe_account
-            )
-            headers = util.populate_headers(idempotency_key)
-            response, api_key = await requestor.request(method, url, params, headers)
-            return util.convert_to_stripe_object(
-                response, api_key, stripe_version, stripe_account
+            return await APIResource._static_request(
+                method,
+                url,
+                api_key=api_key,
+                idempotency_key=idempotency_key,
+                stripe_version=stripe_version,
+                stripe_account=stripe_account,
+                params=params,
             )
     
         setattr(cls, nested_resource_request_method, classmethod(nested_resource_request))

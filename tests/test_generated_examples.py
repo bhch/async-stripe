@@ -58,6 +58,13 @@ class TestGeneratedExamples(object):
             "/v1/checkout/sessions/sess_xyz/expire",
         )
 
+    async def test_checkout_session_list_line_items(self, request_mock):
+        await stripe.checkout.Session.list_line_items("sess_xyz")
+        request_mock.assert_requested(
+            "get",
+            "/v1/checkout/sessions/sess_xyz/line_items",
+        )
+
     async def test_customer_cashbalance_retrieve(self, request_mock):
         await stripe.Customer.retrieve_cash_balance("cus_123")
         request_mock.assert_requested(
@@ -151,6 +158,10 @@ class TestGeneratedExamples(object):
             "/v1/financial_connections/sessions/fcsess_xyz",
         )
 
+    async def test_invoice_upcoming(self, request_mock):
+        await stripe.Invoice.upcoming(customer="cus_9utnxg47pWjV1e")
+        request_mock.assert_requested("get", "/v1/invoices/upcoming")
+
     async def test_order_create(self, request_mock):
         await stripe.Order.create(
             description="description",
@@ -159,12 +170,16 @@ class TestGeneratedExamples(object):
         )
         request_mock.assert_requested("post", "/v1/orders")
 
-    async def test_order_update(self, request_mock):
-        await stripe.Order.modify("order_xyz")
-        request_mock.assert_requested("post", "/v1/orders/order_xyz")
+    async def test_order_retrieve(self, request_mock):
+        await stripe.Order.retrieve("order_xyz")
+        request_mock.assert_requested("get", "/v1/orders/order_xyz")
 
-    async def test_order_update2(self, request_mock):
-        await stripe.Order.modify("order_xyz")
+    async def test_order_update(self, request_mock):
+        await stripe.Order.modify(
+            "order_xyz",
+            metadata={"reference_number": "123"},
+            ip_address="0.0.0.0",
+        )
         request_mock.assert_requested("post", "/v1/orders/order_xyz")
 
     async def test_order_cancel(self, request_mock):
@@ -213,6 +228,19 @@ class TestGeneratedExamples(object):
         request_mock.assert_requested(
             "get", "/v1/payment_links/pl_xyz/line_items"
         )
+
+    async def test_price_create(self, request_mock):
+        await stripe.Price.create(
+            unit_amount=2000,
+            currency="usd",
+            currency_options={
+                "uah": {"unit_amount": 5000},
+                "eur": {"unit_amount": 1800},
+            },
+            recurring={"interval": "month"},
+            product="prod_xxxxxxxxxxxxx",
+        )
+        request_mock.assert_requested("post", "/v1/prices")
 
     async def test_setupattempt_list(self, request_mock):
         await stripe.SetupAttempt.list(limit=3, setup_intent="si_xyz")
@@ -739,6 +767,19 @@ class TestGeneratedExamples(object):
             "post",
             "/v1/credit_notes/cn_xxxxxxxxxxxxx/void",
         )
+
+    async def test_creditnote_preview(self, request_mock):
+        await stripe.CreditNote.preview(
+            invoice="in_xxxxxxxxxxxxx",
+            lines=[
+                {
+                    "type": "invoice_line_item",
+                    "invoice_line_item": "il_xxxxxxxxxxxxx",
+                    "quantity": 1,
+                },
+            ],
+        )
+        request_mock.assert_requested("get", "/v1/credit_notes/preview")
 
     async def test_customer_list(self, request_mock):
         await stripe.Customer.list(limit=3)
@@ -1433,7 +1474,7 @@ class TestGeneratedExamples(object):
         await stripe.Price.list(limit=3)
         request_mock.assert_requested("get", "/v1/prices")
 
-    async def test_price_create(self, request_mock):
+    async def test_price_create2(self, request_mock):
         await stripe.Price.create(
             unit_amount=2000,
             currency="usd",

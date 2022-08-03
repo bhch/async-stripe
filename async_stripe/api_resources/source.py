@@ -3,7 +3,6 @@ from stripe import error
 from stripe import util
 from stripe.api_resources import Customer
 from stripe.six.moves.urllib.parse import quote_plus
-from async_stripe.api_resources.abstract import patch_nested_resources
 
 
 async def detach_patch(self, idempotency_key=None, **params):
@@ -28,17 +27,4 @@ async def detach_patch(self, idempotency_key=None, **params):
         )
 
 
-async def source_transactions_patch(self, **params):
-    """source_transactions is deprecated, use Source.list_source_transactions instead."""
-    return await self.request(
-        "get", self.instance_url() + "/source_transactions", params
-    )
-
-
 stripe.Source.detach = detach_patch
-stripe.Source.source_transactions = source_transactions_patch
-
-
-nested_resources = ["source_transaction"]
-
-patch_nested_resources(stripe.Source, nested_resources)

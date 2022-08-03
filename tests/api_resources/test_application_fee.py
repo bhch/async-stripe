@@ -18,15 +18,6 @@ class TestApplicationFee(object):
         assert isinstance(resources.data, list)
         assert isinstance(resources.data[0], stripe.ApplicationFee)
 
-    async def test_is_refundable(self, request_mock):
-        appfee = await stripe.ApplicationFee.retrieve(TEST_RESOURCE_ID)
-        resource = await appfee.refund()
-        request_mock.assert_requested(
-            "post", "/v1/application_fees/%s/refund" % TEST_RESOURCE_ID
-        )
-        assert isinstance(resource, stripe.ApplicationFee)
-        assert resource is appfee
-
 
 class TestApplicationFeeRefunds(object):
     async def test_is_listable(self, request_mock):

@@ -1,15 +1,4 @@
 import stripe
-from stripe import error
-from stripe import util
-from stripe.api_resources.abstract import DeletableAPIResource
-from stripe.api_resources.abstract import UpdateableAPIResource
-from stripe.api_resources.account import Account
-from stripe.api_resources.customer import Customer
-from stripe.six.moves.urllib.parse import quote_plus
-
-
-class Card(DeletableAPIResource, UpdateableAPIResource):
-    OBJECT_NAME = "card"
 
 
 async def modify_patch(cls, sid, **params):

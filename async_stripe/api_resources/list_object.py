@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import stripe
 from stripe import six, util
 from stripe.stripe_object import StripeObject

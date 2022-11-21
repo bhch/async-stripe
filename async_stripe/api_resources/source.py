@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import stripe
 from stripe import error
 from stripe import util

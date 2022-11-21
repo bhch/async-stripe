@@ -1777,32 +1777,6 @@ class TestGeneratedExamples(object):
             "/v1/sigma/scheduled_query_runs/sqr_xxxxxxxxxxxxx",
         )
 
-    async def test_sku_list(self, request_mock):
-        await stripe.SKU.list(limit=3)
-        request_mock.assert_requested("get", "/v1/skus")
-
-    async def test_sku_create(self, request_mock):
-        await stripe.SKU.create(
-            attributes={"size": "Medium", "gender": "Unisex"},
-            price=1500,
-            currency="usd",
-            inventory={"type": "finite", "quantity": 500},
-            product="prod_xxxxxxxxxxxxx",
-        )
-        request_mock.assert_requested("post", "/v1/skus")
-
-    async def test_sku_delete(self, request_mock):
-        await stripe.SKU.delete("sku_xxxxxxxxxxxxx")
-        request_mock.assert_requested("delete", "/v1/skus/sku_xxxxxxxxxxxxx")
-
-    async def test_sku_retrieve(self, request_mock):
-        await stripe.SKU.retrieve("sku_xxxxxxxxxxxxx")
-        request_mock.assert_requested("get", "/v1/skus/sku_xxxxxxxxxxxxx")
-
-    async def test_sku_update(self, request_mock):
-        await stripe.SKU.modify("sku_xxxxxxxxxxxxx", metadata={"order_id": "6735"})
-        request_mock.assert_requested("post", "/v1/skus/sku_xxxxxxxxxxxxx")
-
     async def test_source_retrieve(self, request_mock):
         await stripe.Source.retrieve("src_xxxxxxxxxxxxx")
         request_mock.assert_requested("get", "/v1/sources/src_xxxxxxxxxxxxx")

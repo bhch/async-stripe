@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import stripe
 from async_stripe.api_resources.abstract import patch_nested_resources
 from stripe import util

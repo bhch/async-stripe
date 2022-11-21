@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import stripe
 from stripe import oauth, six
 from stripe import util

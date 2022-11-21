@@ -6,6 +6,10 @@ from stripe.api_resources.abstract.updateable_api_resource import (
 
 
 async def save_patch(self, idempotency_key=None):
+    """
+    The `save` method is deprecated and will be removed in a future major version of the library.
+    Use the class method `modify` on the resource instead.
+    """
     updated_params = self.serialize(None)
 
     if updated_params:

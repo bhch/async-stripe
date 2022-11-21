@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import stripe
 from stripe import util
 from stripe.api_resources.abstract import ListableAPIResource

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from async_stripe.api_resources.abstract import *
 
 from async_stripe.api_resources import list_object

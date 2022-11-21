@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import stripe
 from stripe import api_requestor
 from stripe import util

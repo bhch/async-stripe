@@ -22,10 +22,11 @@ keywords = ["stripe", "async", "asynchronous", "wrapper"]
 python = "^3.6"
 stripe = "5.1.0"
 tornado = ">=5.1"
+mypy = "^0.940"
 
 [tool.poetry.dev-dependencies]
 bandit = "^1.7.0"
-mypy = "^0.812"
+mypy = "^0.940"
 flake8 = "^3.9.2"
 pytest = "^6.2.4"
 pytest-mock = "^3.6.1"

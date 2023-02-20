@@ -493,17 +493,6 @@ class TestGeneratedExamples(object):
             "/v1/accounts/acct_xxxxxxxxxxxxx/capabilities/card_payments",
         )
 
-    async def test_subscription_resume(self, request_mock):
-        await stripe.Subscription.resume(
-            "sub_xxxxxxxxxxxxx",
-            proration_date=1675400000,
-            proration_behavior="always_invoice",
-        )
-        request_mock.assert_requested(
-            "post",
-            "/v1/subscriptions/sub_xxxxxxxxxxxxx/resume",
-        )
-
     async def test_account_person_retrieve(self, request_mock):
         await stripe.Account.retrieve_person(
             "acct_xxxxxxxxxxxxx", "person_xxxxxxxxxxxxx"
@@ -555,6 +544,10 @@ class TestGeneratedExamples(object):
             "post",
             "/v1/application_fees/fee_xxxxxxxxxxxxx/refunds/fr_xxxxxxxxxxxxx",
         )
+
+    async def test_apps_secret_list2(self, request_mock):
+        await stripe.apps.Secret.list(scope={"type": "account"}, limit=2)
+        request_mock.assert_requested("get", "/v1/apps/secrets")
 
     async def test_apps_secret_create2(self, request_mock):
         await stripe.apps.Secret.create(
@@ -635,7 +628,7 @@ class TestGeneratedExamples(object):
             amount=2000,
             currency="usd",
             source="tok_xxxx",
-            description="My First Test Charge (created for API docs)",
+            description="My First Test Charge (created for API docs at https://www.stripe.com/docs/api)",
         )
         request_mock.assert_requested("post", "/v1/charges")
 
@@ -667,7 +660,6 @@ class TestGeneratedExamples(object):
     async def test_checkout_session_create2(self, request_mock):
         await stripe.checkout.Session.create(
             success_url="https://example.com/success",
-            cancel_url="https://example.com/cancel",
             line_items=[{"price": "price_xxxxxxxxxxxxx", "quantity": 2}],
             mode="payment",
         )
@@ -766,7 +758,7 @@ class TestGeneratedExamples(object):
 
     async def test_customer_create(self, request_mock):
         await stripe.Customer.create(
-            description="My First Test Customer (created for API docs)",
+            description="My First Test Customer (created for API docs at https://www.stripe.com/docs/api)",
         )
         request_mock.assert_requested("post", "/v1/customers")
 
@@ -897,6 +889,13 @@ class TestGeneratedExamples(object):
         request_mock.assert_requested(
             "get",
             "/v1/financial_connections/accounts/fca_xxxxxxxxxxxxx",
+        )
+
+    async def test_financial_connections_account_disconnect2(self, request_mock):
+        await stripe.financial_connections.Account.disconnect("fca_xxxxxxxxxxxxx")
+        request_mock.assert_requested(
+            "post",
+            "/v1/financial_connections/accounts/fca_xxxxxxxxxxxxx/disconnect",
         )
 
     async def test_financial_connections_account_list_owners2(self, request_mock):
@@ -1243,7 +1242,7 @@ class TestGeneratedExamples(object):
         await stripe.PaymentIntent.create(
             amount=2000,
             currency="usd",
-            payment_method_types=["card"],
+            automatic_payment_methods={"enabled": True},
         )
         request_mock.assert_requested("post", "/v1/payment_intents")
 
@@ -1304,6 +1303,16 @@ class TestGeneratedExamples(object):
             "/v1/payment_intents/pi_xxxxxxxxxxxxx/increment_authorization",
         )
 
+    async def test_paymentintent_verify_microdeposits2(self, request_mock):
+        await stripe.PaymentIntent.verify_microdeposits(
+            "pi_xxxxxxxxxxxxx",
+            amounts=[32, 45],
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/payment_intents/pi_xxxxxxxxxxxxx/verify_microdeposits",
+        )
+
     async def test_paymentintent_search(self, request_mock):
         await stripe.PaymentIntent.search(
             query="status:'succeeded' AND metadata['order_id']:'6735'",
@@ -1343,8 +1352,8 @@ class TestGeneratedExamples(object):
             type="card",
             card={
                 "number": "4242424242424242",
-                "exp_month": 5,
-                "exp_year": 2023,
+                "exp_month": 8,
+                "exp_year": 2024,
                 "cvc": "314",
             },
         )
@@ -1749,6 +1758,16 @@ class TestGeneratedExamples(object):
             "/v1/setup_intents/seti_xxxxxxxxxxxxx/confirm",
         )
 
+    async def test_setupintent_verify_microdeposits2(self, request_mock):
+        await stripe.SetupIntent.verify_microdeposits(
+            "seti_xxxxxxxxxxxxx",
+            amounts=[32, 45],
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/setup_intents/seti_xxxxxxxxxxxxx/verify_microdeposits",
+        )
+
     async def test_shippingrate_list2(self, request_mock):
         await stripe.ShippingRate.list(limit=3)
         request_mock.assert_requested("get", "/v1/shipping_rates")
@@ -1845,7 +1864,7 @@ class TestGeneratedExamples(object):
     async def test_subscriptionschedule_create(self, request_mock):
         await stripe.SubscriptionSchedule.create(
             customer="cus_xxxxxxxxxxxxx",
-            start_date=1652909005,
+            start_date=1676070661,
             end_behavior="release",
             phases=[
                 {
@@ -2001,8 +2020,9 @@ class TestGeneratedExamples(object):
             address={
                 "line1": "1234 Main Street",
                 "city": "San Francisco",
-                "country": "US",
                 "postal_code": "94111",
+                "state": "CA",
+                "country": "US",
             },
         )
         request_mock.assert_requested("post", "/v1/terminal/locations")
@@ -2081,6 +2101,17 @@ class TestGeneratedExamples(object):
             "/v1/terminal/readers/tmr_xxxxxxxxxxxxx/process_payment_intent",
         )
 
+    async def test_terminal_reader_process_setup_intent(self, request_mock):
+        await stripe.terminal.Reader.process_setup_intent(
+            "tmr_xxxxxxxxxxxxx",
+            setup_intent="seti_xxxxxxxxxxxxx",
+            customer_consent_collected=True,
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/terminal/readers/tmr_xxxxxxxxxxxxx/process_setup_intent",
+        )
+
     async def test_test_helpers_testclock_list2(self, request_mock):
         await stripe.test_helpers.TestClock.list(limit=3)
         request_mock.assert_requested("get", "/v1/test_helpers/test_clocks")
@@ -2106,7 +2137,7 @@ class TestGeneratedExamples(object):
     async def test_test_helpers_testclock_advance2(self, request_mock):
         await stripe.test_helpers.TestClock.advance(
             "clock_xxxxxxxxxxxxx",
-            frozen_time=1652390605,
+            frozen_time=1675552261,
         )
         request_mock.assert_requested(
             "post",
@@ -2302,16 +2333,6 @@ class TestGeneratedExamples(object):
             "/v1/treasury/financial_accounts/fa_xxxxxxxxxxxxx/features",
         )
 
-    async def test_treasury_financialaccount_update_features(self, request_mock):
-        await stripe.treasury.FinancialAccount.update_features(
-            "fa_xxxxxxxxxxxxx",
-            card_issuing={"requested": False},
-        )
-        request_mock.assert_requested(
-            "post",
-            "/v1/treasury/financial_accounts/fa_xxxxxxxxxxxxx/features",
-        )
-
     async def test_treasury_inboundtransfer_list(self, request_mock):
         await stripe.treasury.InboundTransfer.list(
             financial_account="fa_xxxxxxxxxxxxx",
@@ -2355,24 +2376,24 @@ class TestGeneratedExamples(object):
             financial_account="fa_xxxxxxxxxxxxx",
             amount=10000,
             currency="usd",
-            customer="cu_xxxxxxxxxxxxx",
+            customer="cus_xxxxxxxxxxxxx",
             destination_payment_method="pm_xxxxxxxxxxxxx",
             description="OutboundPayment to a 3rd party",
         )
         request_mock.assert_requested("post", "/v1/treasury/outbound_payments")
 
     async def test_treasury_outboundpayment_retrieve(self, request_mock):
-        await stripe.treasury.OutboundPayment.retrieve("obp_xxxxxxxxxxxxx")
+        await stripe.treasury.OutboundPayment.retrieve("bot_xxxxxxxxxxxxx")
         request_mock.assert_requested(
             "get",
-            "/v1/treasury/outbound_payments/obp_xxxxxxxxxxxxx",
+            "/v1/treasury/outbound_payments/bot_xxxxxxxxxxxxx",
         )
 
     async def test_treasury_outboundpayment_cancel(self, request_mock):
-        await stripe.treasury.OutboundPayment.cancel("obp_xxxxxxxxxxxxx")
+        await stripe.treasury.OutboundPayment.cancel("bot_xxxxxxxxxxxxx")
         request_mock.assert_requested(
             "post",
-            "/v1/treasury/outbound_payments/obp_xxxxxxxxxxxxx/cancel",
+            "/v1/treasury/outbound_payments/bot_xxxxxxxxxxxxx/cancel",
         )
 
     async def test_treasury_outboundtransfer_list(self, request_mock):

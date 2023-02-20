@@ -23,12 +23,13 @@ python = "^3.6"
 stripe = "5.1.0"
 tornado = ">=5.1"
 mypy = "^0.940"
+pytest = "7.0.1"
 
 [tool.poetry.dev-dependencies]
 bandit = "^1.7.0"
 mypy = "^0.940"
 flake8 = "^3.9.2"
-pytest = "^6.2.4"
+pytest = "7.0.1"
 pytest-mock = "^3.6.1"
 pytest-asyncio = "^0.15.1"
 

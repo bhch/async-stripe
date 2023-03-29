@@ -1034,6 +1034,10 @@ class TestGeneratedExamples(object):
         await stripe.Invoice.retrieve("in_xxxxxxxxxxxxx")
         request_mock.assert_requested("get", "/v1/invoices/in_xxxxxxxxxxxxx")
 
+    async def test_invoice_retrieve2(self, request_mock):
+        await stripe.Invoice.retrieve("in_xxxxxxxxxxxxx", expand=["customer"])
+        request_mock.assert_requested("get", "/v1/invoices/in_xxxxxxxxxxxxx")
+
     async def test_invoice_update(self, request_mock):
         await stripe.Invoice.modify(
             "in_xxxxxxxxxxxxx", metadata={"order_id": "6735"}
@@ -2520,4 +2524,20 @@ class TestGeneratedExamples(object):
         request_mock.assert_requested(
             "post",
             "/v1/webhook_endpoints/we_xxxxxxxxxxxxx",
+        )
+
+    async def test_tax_transaction_create_from_calculation(self, request_mock):
+        await stripe.tax.Transaction.create_from_calculation(
+            calculation="xxx",
+            reference="yyy",
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/tax/transactions/create_from_calculation",
+        )
+
+    async def test_tax_calculation_list_line_items(self, request_mock):
+        await stripe.tax.Calculation.list_line_items("xxx")
+        request_mock.assert_requested(
+            "get", "/v1/tax/calculations/xxx/line_items"
         )

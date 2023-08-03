@@ -8,6 +8,16 @@ pytestmark = pytest.mark.asyncio
 
 
 class TestGeneratedExamples(object):
+    async def test_account_externalaccount_list(self, request_mock):
+        await stripe.Account.list_external_accounts(
+            "acct_xxxxxxxxxxxxx",
+            limit=3,
+        )
+        request_mock.assert_requested(
+            "get",
+            "/v1/accounts/acct_xxxxxxxxxxxxx/external_accounts",
+        )
+
     async def test_apps_secret_list(self, request_mock):
         await stripe.apps.Secret.list(scope={"type": "account"}, limit=2)
         request_mock.assert_requested("get", "/v1/apps/secrets")
@@ -100,6 +110,17 @@ class TestGeneratedExamples(object):
         request_mock.assert_requested(
             "get",
             "/v1/customers/cus_xyz/payment_methods",
+        )
+
+    async def test_customer_paymentsource_update(self, request_mock):
+        await stripe.Customer.modify_source(
+            "cus_123",
+            "card_123",
+            account_holder_name="Kamil",
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/customers/cus_123/sources/card_123",
         )
 
     async def test_financial_connections_account_list(self, request_mock):
@@ -473,6 +494,13 @@ class TestGeneratedExamples(object):
             "/v1/accounts/acct_xxxxxxxxxxxxx/reject",
         )
 
+    async def test_account_capability_list(self, request_mock):
+        await stripe.Account.list_capabilities("acct_xxxxxxxxxxxxx")
+        request_mock.assert_requested(
+            "get",
+            "/v1/accounts/acct_xxxxxxxxxxxxx/capabilities",
+        )
+
     async def test_account_capability_retrieve(self, request_mock):
         await stripe.Account.retrieve_capability(
             "acct_xxxxxxxxxxxxx", "card_payments"
@@ -491,6 +519,126 @@ class TestGeneratedExamples(object):
         request_mock.assert_requested(
             "post",
             "/v1/accounts/acct_xxxxxxxxxxxxx/capabilities/card_payments",
+        )
+
+    async def test_account_externalaccount_create(self, request_mock):
+        await stripe.Account.create_external_account(
+            "acct_xxxxxxxxxxxxx",
+            external_account="btok_xxxxxxxxxxxxx",
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/accounts/acct_xxxxxxxxxxxxx/external_accounts",
+        )
+
+    async def test_account_externalaccount_create2(self, request_mock):
+        await stripe.Account.create_external_account(
+            "acct_xxxxxxxxxxxxx",
+            external_account="tok_xxxx_debit",
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/accounts/acct_xxxxxxxxxxxxx/external_accounts",
+        )
+
+    async def test_account_externalaccount_delete(self, request_mock):
+        await stripe.Account.delete_external_account(
+            "acct_xxxxxxxxxxxxx",
+            "ba_xxxxxxxxxxxxx",
+        )
+        request_mock.assert_requested(
+            "delete",
+            "/v1/accounts/acct_xxxxxxxxxxxxx/external_accounts/ba_xxxxxxxxxxxxx",
+        )
+
+    async def test_account_externalaccount_delete2(self, request_mock):
+        await stripe.Account.delete_external_account(
+            "acct_xxxxxxxxxxxxx",
+            "card_xxxxxxxxxxxxx",
+        )
+        request_mock.assert_requested(
+            "delete",
+            "/v1/accounts/acct_xxxxxxxxxxxxx/external_accounts/card_xxxxxxxxxxxxx",
+        )
+
+    async def test_account_externalaccount_retrieve(self, request_mock):
+        await stripe.Account.retrieve_external_account(
+            "acct_xxxxxxxxxxxxx",
+            "ba_xxxxxxxxxxxxx",
+        )
+        request_mock.assert_requested(
+            "get",
+            "/v1/accounts/acct_xxxxxxxxxxxxx/external_accounts/ba_xxxxxxxxxxxxx",
+        )
+
+    async def test_account_externalaccount_retrieve2(self, request_mock):
+        await stripe.Account.retrieve_external_account(
+            "acct_xxxxxxxxxxxxx",
+            "card_xxxxxxxxxxxxx",
+        )
+        request_mock.assert_requested(
+            "get",
+            "/v1/accounts/acct_xxxxxxxxxxxxx/external_accounts/card_xxxxxxxxxxxxx",
+        )
+
+    async def test_account_externalaccount_update(self, request_mock):
+        await stripe.Account.modify_external_account(
+            "acct_xxxxxxxxxxxxx",
+            "ba_xxxxxxxxxxxxx",
+            metadata={"order_id": "6735"},
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/accounts/acct_xxxxxxxxxxxxx/external_accounts/ba_xxxxxxxxxxxxx",
+        )
+
+    async def test_account_externalaccount_update2(self, request_mock):
+        await stripe.Account.modify_external_account(
+            "acct_xxxxxxxxxxxxx",
+            "card_xxxxxxxxxxxxx",
+            metadata={"order_id": "6735"},
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/accounts/acct_xxxxxxxxxxxxx/external_accounts/card_xxxxxxxxxxxxx",
+        )
+
+    async def test_account_loginlink_create(self, request_mock):
+        await stripe.Account.create_login_link("acct_xxxxxxxxxxxxx")
+        request_mock.assert_requested(
+            "post",
+            "/v1/accounts/acct_xxxxxxxxxxxxx/login_links",
+        )
+
+    async def test_account_person_list(self, request_mock):
+        await stripe.Account.list_persons(
+            "acct_xxxxxxxxxxxxx",
+            limit=3,
+        )
+        request_mock.assert_requested(
+            "get",
+            "/v1/accounts/acct_xxxxxxxxxxxxx/persons",
+        )
+
+    async def test_account_person_create(self, request_mock):
+        await stripe.Account.create_person(
+            "acct_xxxxxxxxxxxxx",
+            first_name="Jane",
+            last_name="Diaz",
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/accounts/acct_xxxxxxxxxxxxx/persons",
+        )
+
+    async def test_account_person_delete(self, request_mock):
+        await stripe.Account.delete_person(
+            "acct_xxxxxxxxxxxxx",
+            "person_xxxxxxxxxxxxx",
+        )
+        request_mock.assert_requested(
+            "delete",
+            "/v1/accounts/acct_xxxxxxxxxxxxx/persons/person_xxxxxxxxxxxxx",
         )
 
     async def test_account_person_retrieve(self, request_mock):
@@ -522,6 +670,23 @@ class TestGeneratedExamples(object):
         request_mock.assert_requested(
             "get",
             "/v1/application_fees/fee_xxxxxxxxxxxxx",
+        )
+
+    async def test_applicationfee_feerefund_list(self, request_mock):
+        await stripe.ApplicationFee.list_refunds(
+            "fee_xxxxxxxxxxxxx",
+            limit=3,
+        )
+        request_mock.assert_requested(
+            "get",
+            "/v1/application_fees/fee_xxxxxxxxxxxxx/refunds",
+        )
+
+    async def test_applicationfee_feerefund_create(self, request_mock):
+        await stripe.ApplicationFee.create_refund("fee_xxxxxxxxxxxxx")
+        request_mock.assert_requested(
+            "post",
+            "/v1/application_fees/fee_xxxxxxxxxxxxx/refunds",
         )
 
     async def test_applicationfee_feerefund_retrieve(self, request_mock):
@@ -735,6 +900,16 @@ class TestGeneratedExamples(object):
             "/v1/credit_notes/cn_xxxxxxxxxxxxx/void",
         )
 
+    async def test_creditnote_creditnotelineitem_list(self, request_mock):
+        await stripe.CreditNote.list_lines(
+            "cn_xxxxxxxxxxxxx",
+            limit=3,
+        )
+        request_mock.assert_requested(
+            "get",
+            "/v1/credit_notes/cn_xxxxxxxxxxxxx/lines",
+        )
+
     async def test_creditnote_preview(self, request_mock):
         await stripe.CreditNote.preview(
             invoice="in_xxxxxxxxxxxxx",
@@ -780,6 +955,27 @@ class TestGeneratedExamples(object):
             "post", "/v1/customers/cus_xxxxxxxxxxxxx"
         )
 
+    async def test_customer_customerbalancetransaction_list(self, request_mock):
+        await stripe.Customer.list_balance_transactions(
+            "cus_xxxxxxxxxxxxx",
+            limit=3,
+        )
+        request_mock.assert_requested(
+            "get",
+            "/v1/customers/cus_xxxxxxxxxxxxx/balance_transactions",
+        )
+
+    async def test_customer_customerbalancetransaction_create(self, request_mock):
+        await stripe.Customer.create_balance_transaction(
+            "cus_xxxxxxxxxxxxx",
+            amount=-500,
+            currency="usd",
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/customers/cus_xxxxxxxxxxxxx/balance_transactions",
+        )
+
     async def test_customer_customerbalancetransaction_retrieve(self, request_mock):
         await stripe.Customer.retrieve_balance_transaction(
             "cus_xxxxxxxxxxxxx",
@@ -790,11 +986,157 @@ class TestGeneratedExamples(object):
             "/v1/customers/cus_xxxxxxxxxxxxx/balance_transactions/cbtxn_xxxxxxxxxxxxx",
         )
 
+    async def test_customer_customerbalancetransaction_update(self, request_mock):
+        await stripe.Customer.modify_balance_transaction(
+            "cus_xxxxxxxxxxxxx",
+            "cbtxn_xxxxxxxxxxxxx",
+            metadata={"order_id": "6735"},
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/customers/cus_xxxxxxxxxxxxx/balance_transactions/cbtxn_xxxxxxxxxxxxx",
+        )
+
     async def test_customer_list_payment_methods2(self, request_mock):
         await stripe.Customer.list_payment_methods("cus_xxxxxxxxxxxxx", type="card")
         request_mock.assert_requested(
             "get",
             "/v1/customers/cus_xxxxxxxxxxxxx/payment_methods",
+        )
+
+    async def test_customer_paymentsource_list(self, request_mock):
+        await stripe.Customer.list_sources(
+            "cus_xxxxxxxxxxxxx",
+            object="bank_account",
+            limit=3,
+        )
+        request_mock.assert_requested(
+            "get",
+            "/v1/customers/cus_xxxxxxxxxxxxx/sources",
+        )
+
+    async def test_customer_paymentsource_list2(self, request_mock):
+        await stripe.Customer.list_sources(
+            "cus_xxxxxxxxxxxxx",
+            object="card",
+            limit=3,
+        )
+        request_mock.assert_requested(
+            "get",
+            "/v1/customers/cus_xxxxxxxxxxxxx/sources",
+        )
+
+    async def test_customer_paymentsource_create(self, request_mock):
+        await stripe.Customer.create_source(
+            "cus_xxxxxxxxxxxxx",
+            source="btok_xxxxxxxxxxxxx",
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/customers/cus_xxxxxxxxxxxxx/sources",
+        )
+
+    async def test_customer_paymentsource_create2(self, request_mock):
+        await stripe.Customer.create_source(
+            "cus_xxxxxxxxxxxxx",
+            source="tok_xxxx",
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/customers/cus_xxxxxxxxxxxxx/sources",
+        )
+
+    async def test_customer_paymentsource_delete(self, request_mock):
+        await stripe.Customer.delete_source(
+            "cus_xxxxxxxxxxxxx",
+            "ba_xxxxxxxxxxxxx",
+        )
+        request_mock.assert_requested(
+            "delete",
+            "/v1/customers/cus_xxxxxxxxxxxxx/sources/ba_xxxxxxxxxxxxx",
+        )
+
+    async def test_customer_paymentsource_delete2(self, request_mock):
+        await stripe.Customer.delete_source(
+            "cus_xxxxxxxxxxxxx",
+            "card_xxxxxxxxxxxxx",
+        )
+        request_mock.assert_requested(
+            "delete",
+            "/v1/customers/cus_xxxxxxxxxxxxx/sources/card_xxxxxxxxxxxxx",
+        )
+
+    async def test_customer_paymentsource_retrieve(self, request_mock):
+        await stripe.Customer.retrieve_source(
+            "cus_xxxxxxxxxxxxx",
+            "ba_xxxxxxxxxxxxx",
+        )
+        request_mock.assert_requested(
+            "get",
+            "/v1/customers/cus_xxxxxxxxxxxxx/sources/ba_xxxxxxxxxxxxx",
+        )
+
+    async def test_customer_paymentsource_retrieve2(self, request_mock):
+        await stripe.Customer.retrieve_source(
+            "cus_xxxxxxxxxxxxx",
+            "card_xxxxxxxxxxxxx",
+        )
+        request_mock.assert_requested(
+            "get",
+            "/v1/customers/cus_xxxxxxxxxxxxx/sources/card_xxxxxxxxxxxxx",
+        )
+
+    async def test_customer_paymentsource_update2(self, request_mock):
+        await stripe.Customer.modify_source(
+            "cus_xxxxxxxxxxxxx",
+            "ba_xxxxxxxxxxxxx",
+            metadata={"order_id": "6735"},
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/customers/cus_xxxxxxxxxxxxx/sources/ba_xxxxxxxxxxxxx",
+        )
+
+    async def test_customer_paymentsource_update3(self, request_mock):
+        await stripe.Customer.modify_source(
+            "cus_xxxxxxxxxxxxx",
+            "card_xxxxxxxxxxxxx",
+            name="Jenny Rosen",
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/customers/cus_xxxxxxxxxxxxx/sources/card_xxxxxxxxxxxxx",
+        )
+
+    async def test_customer_taxid_list(self, request_mock):
+        await stripe.Customer.list_tax_ids(
+            "cus_xxxxxxxxxxxxx",
+            limit=3,
+        )
+        request_mock.assert_requested(
+            "get",
+            "/v1/customers/cus_xxxxxxxxxxxxx/tax_ids",
+        )
+
+    async def test_customer_taxid_create(self, request_mock):
+        await stripe.Customer.create_tax_id(
+            "cus_xxxxxxxxxxxxx",
+            type="eu_vat",
+            value="DE123456789",
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/customers/cus_xxxxxxxxxxxxx/tax_ids",
+        )
+
+    async def test_customer_taxid_delete(self, request_mock):
+        await stripe.Customer.delete_tax_id(
+            "cus_xxxxxxxxxxxxx",
+            "txi_xxxxxxxxxxxxx",
+        )
+        request_mock.assert_requested(
+            "delete",
+            "/v1/customers/cus_xxxxxxxxxxxxx/tax_ids/txi_xxxxxxxxxxxxx",
         )
 
     async def test_customer_taxid_retrieve(self, request_mock):
@@ -1438,6 +1780,15 @@ class TestGeneratedExamples(object):
         )
         request_mock.assert_requested("post", "/v1/plans")
 
+    async def test_plan_create2(self, request_mock):
+        await stripe.Plan.create(
+            amount=2000,
+            currency="usd",
+            interval="month",
+            product={"name": "My product"},
+        )
+        request_mock.assert_requested("post", "/v1/plans")
+
     async def test_plan_delete(self, request_mock):
         await stripe.Plan.delete("price_xxxxxxxxxxxxx")
         request_mock.assert_requested(
@@ -1861,6 +2212,27 @@ class TestGeneratedExamples(object):
             "/v1/subscription_items/si_xxxxxxxxxxxxx",
         )
 
+    async def test_subscriptionitem_usagerecordsummary_list(self, request_mock):
+        await stripe.SubscriptionItem.list_usage_record_summaries(
+            "si_xxxxxxxxxxxxx",
+            limit=3,
+        )
+        request_mock.assert_requested(
+            "get",
+            "/v1/subscription_items/si_xxxxxxxxxxxxx/usage_record_summaries",
+        )
+
+    async def test_subscriptionitem_usagerecord_create(self, request_mock):
+        await stripe.SubscriptionItem.create_usage_record(
+            "si_xxxxxxxxxxxxx",
+            quantity=100,
+            timestamp=1571252444,
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/subscription_items/si_xxxxxxxxxxxxx/usage_records",
+        )
+
     async def test_subscriptionschedule_list(self, request_mock):
         await stripe.SubscriptionSchedule.list(limit=3)
         request_mock.assert_requested("get", "/v1/subscription_schedules")
@@ -1920,6 +2292,13 @@ class TestGeneratedExamples(object):
             items=[{"price": "price_xxxxxxxxxxxxx"}],
         )
         request_mock.assert_requested("post", "/v1/subscriptions")
+
+    async def test_subscription_cancel(self, request_mock):
+        await stripe.Subscription.cancel("sub_xxxxxxxxxxxxx")
+        request_mock.assert_requested(
+            "delete",
+            "/v1/subscriptions/sub_xxxxxxxxxxxxx",
+        )
 
     async def test_subscription_retrieve(self, request_mock):
         await stripe.Subscription.retrieve("sub_xxxxxxxxxxxxx")
@@ -2242,6 +2621,26 @@ class TestGeneratedExamples(object):
         )
         request_mock.assert_requested("post", "/v1/transfers/tr_xxxxxxxxxxxxx")
 
+    async def test_transfer_transferreversal_list(self, request_mock):
+        await stripe.Transfer.list_reversals(
+            "tr_xxxxxxxxxxxxx",
+            limit=3,
+        )
+        request_mock.assert_requested(
+            "get",
+            "/v1/transfers/tr_xxxxxxxxxxxxx/reversals",
+        )
+
+    async def test_transfer_transferreversal_create(self, request_mock):
+        await stripe.Transfer.create_reversal(
+            "tr_xxxxxxxxxxxxx",
+            amount=100,
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/transfers/tr_xxxxxxxxxxxxx/reversals",
+        )
+
     async def test_transfer_transferreversal_retrieve(self, request_mock):
         await stripe.Transfer.retrieve_reversal(
             "tr_xxxxxxxxxxxxx", "trr_xxxxxxxxxxxxx"
@@ -2540,4 +2939,49 @@ class TestGeneratedExamples(object):
         await stripe.tax.Calculation.list_line_items("xxx")
         request_mock.assert_requested(
             "get", "/v1/tax/calculations/xxx/line_items"
+        )
+
+    async def test_paymentintent_create3(self, request_mock):
+        await stripe.PaymentIntent.create(
+            amount=200,
+            currency="usd",
+            payment_method_data={"type": "p24", "p24": {"bank": "blik"}},
+        )
+        request_mock.assert_requested("post", "/v1/payment_intents")
+
+    async def test_quote_list_line_items(self, request_mock):
+        await stripe.Quote.list_line_items("qt_xxxxxxxxxxxxx")
+        request_mock.assert_requested(
+            "get",
+            "/v1/quotes/qt_xxxxxxxxxxxxx/line_items",
+        )
+
+    async def test_tax_calculation_create(self, request_mock):
+        await stripe.tax.Calculation.create(
+            currency="usd",
+            line_items=[{"amount": 1000, "reference": "L1"}],
+            customer_details={
+                "address": {
+                    "line1": "354 Oyster Point Blvd",
+                    "city": "South San Francisco",
+                    "state": "CA",
+                    "postal_code": "94080",
+                    "country": "US",
+                },
+                "address_source": "shipping",
+            },
+        )
+        request_mock.assert_requested(
+            "post",
+            "/v1/tax/calculations",
+        )
+
+    async def test_creditnote_preview_lines(self, request_mock):
+        await stripe.CreditNote.preview_lines(
+            limit=3,
+            invoice="in_xxxxxxxxxxxxx",
+        )
+        request_mock.assert_requested(
+            "get",
+            "/v1/credit_notes/preview/lines",
         )

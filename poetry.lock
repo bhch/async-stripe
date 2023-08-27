@@ -338,11 +338,11 @@ pbr = ">=2.0.0,<2.1.0 || >2.1.0"
 
 [[package]]
 name = "stripe"
-version = "5.5.0"
+version = "6.0.0"
 description = "Python bindings for the Stripe API"
 category = "main"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+python-versions = ">=3.6"
 
 [package.dependencies]
 requests = {version = ">=2.20", markers = "python_version >= \"3.0\""}
@@ -407,7 +407,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "a933e90af8d7e08083342787e38afaa19ed87a33fc02e2b10fedc1aede92d488"
+content-hash = "7cc743aad63ae6e245851a8692305aaf56dc5781f6f87ed347db8f7cbeac1680"
 
 [metadata.files]
 atomicwrites = [

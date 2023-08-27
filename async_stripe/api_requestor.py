@@ -1,7 +1,7 @@
 import stripe
-from stripe import error, version, util, six
+from stripe import error, version, util
 from stripe.multipart_data_generator import MultipartDataGenerator
-from stripe.six.moves.urllib.parse import urlencode
+from urllib.parse import urlencode
 
 from stripe.api_requestor import APIRequestor
 from stripe.api_requestor import _build_api_url, _api_encode
@@ -139,7 +139,7 @@ async def request_raw_patch(self, method, url, params=None, supplied_headers=Non
 
     headers = self.request_headers(my_api_key, method)
     if supplied_headers is not None:
-        for key, value in six.iteritems(supplied_headers):
+        for key, value in supplied_headers.items():
             headers[key] = value
 
     util.log_info("Request to Stripe api", method=method, path=abs_url)

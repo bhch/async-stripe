@@ -6,7 +6,7 @@ import asyncio
 
 import stripe
 import urllib3
-from stripe import six, util
+from stripe import util
 
 from async_stripe.http_client import TornadoAsyncHTTPClient
 

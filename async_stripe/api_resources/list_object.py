@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 import stripe
-from stripe import six, util
-from stripe.stripe_object import StripeObject
-
-from stripe.six.moves.urllib.parse import quote_plus
 
 
 async def auto_paging_iter_patch(self):

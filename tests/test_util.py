@@ -5,7 +5,7 @@ from collections import namedtuple
 
 import stripe
 from stripe import util
-from stripe.six.moves import builtins
+import builtins
 
 PRINT_FUNC_STRING = builtins.__name__ + ".print"
 
@@ -142,7 +142,7 @@ class TestUtil(object):
 
         obj = util.convert_to_stripe_object(resp)
         assert isinstance(obj, stripe.Balance)
-        assert type(obj.available) == list
+        assert isinstance(obj.available, list)
         assert isinstance(obj.available[0], stripe.stripe_object.StripeObject)
 
         d = util.convert_to_dict(obj)

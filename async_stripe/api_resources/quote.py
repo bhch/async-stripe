@@ -2,7 +2,7 @@
 import stripe
 from stripe import util
 from stripe import api_requestor
-from stripe.six.moves.urllib.parse import quote_plus
+from urllib.parse import quote_plus
 
 
 async def _cls_pdf_patch(
@@ -16,7 +16,7 @@ async def _cls_pdf_patch(
 ):
     url = "%s/%s/%s" % (
         cls.class_url(),
-        quote_plus(util.utf8(sid)),
+        quote_plus(sid),
         "pdf",
     )
     requestor = api_requestor.APIRequestor(

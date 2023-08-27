@@ -11,7 +11,6 @@ pytestmark = pytest.mark.asyncio
 
 
 class TestTestHelperAPIResource(object):
-    @stripe.api_resources.abstract.test_helpers
     class MyTestHelpersResource(stripe.api_resources.abstract.APIResource):
         OBJECT_NAME = "myresource"
 
@@ -33,6 +32,12 @@ class TestTestHelperAPIResource(object):
         patch_custom_methods(TestHelpers, 
             [{"name": "do_stuff", "http_verb": "post", "http_path": "do_the_thing"}]
         )
+
+        @property
+        def test_helpers(self):
+            return self.TestHelpers(self)
+
+    MyTestHelpersResource.TestHelpers._resource_cls = MyTestHelpersResource
 
     async def test_call_custom_method_class(self, request_mock):
         request_mock.stub_request(
@@ -68,7 +73,3 @@ class TestTestHelperAPIResource(object):
             {"foo": "bar"},
         )
         assert obj.thing_done is True
-
-    def test_helper_decorator_raises_for_non_resource(self):
-        with pytest.raises(ValueError):
-            stripe.api_resources.abstract.test_helpers(str)

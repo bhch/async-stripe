@@ -1,5 +1,5 @@
 from stripe import util
-from stripe.six.moves.urllib.parse import quote_plus
+from urllib.parse import quote_plus
 
 
 
@@ -27,7 +27,7 @@ def _patch(cls, name, http_verb, http_path, is_streaming):
     async def custom_method_request(cls, sid, **params):
         url = "%s/%s/%s" % (
             cls.class_url(),
-            quote_plus(util.utf8(sid)),
+            quote_plus(sid),
             http_path,
         )
         obj = await cls._static_request(http_verb, url, params=params)
@@ -42,7 +42,7 @@ def _patch(cls, name, http_verb, http_path, is_streaming):
     async def custom_method_request_stream(cls, sid, **params):
         url = "%s/%s/%s" % (
             cls.class_url(),
-            quote_plus(util.utf8(sid)),
+            quote_plus(sid),
             http_path,
         )
         return await cls._static_request_stream(http_verb, url, params=params)

@@ -1,5 +1,4 @@
 from stripe import util
-from stripe.six.moves.urllib.parse import quote_plus
 from stripe.api_resources.abstract.updateable_api_resource import (
     UpdateableAPIResource,
 )

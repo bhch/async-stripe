@@ -1,7 +1,4 @@
-from stripe import error, util, six
-from stripe.six.moves.urllib.parse import quote_plus
 from stripe.api_resources.abstract.test_helpers import APIResourceTestHelpers
-from async_stripe.api_resources.abstract.api_resource import APIResource
 
 
 # Some resource classes have a nested TestHelpers class

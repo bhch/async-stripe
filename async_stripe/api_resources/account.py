@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 import stripe
-from stripe import oauth, six
-from stripe import util
-from stripe.six.moves.urllib.parse import quote_plus
 from async_stripe.api_resources.abstract import patch_nested_resources
 
 

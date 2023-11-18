@@ -17,13 +17,15 @@ VALID_API_METHODS = ("get", "post", "delete")
 
 
 class StripeClientTestCase(object):
-    REQUEST_LIBRARIES = ["AsyncHTTPClient"]
+    REQUEST_LIBRARIES = [
+        ("AsyncHTTPClient", "async_stripe.http_client.AsyncHTTPClient"),
+    ]
 
     @pytest.fixture
     def request_mocks(self, mocker):
         request_mocks = {}
-        for lib in self.REQUEST_LIBRARIES:
-            request_mocks[lib] = mocker.patch("async_stripe.http_client.%s" % (lib,))
+        for lib, mockpath in self.REQUEST_LIBRARIES:
+            request_mocks[lib] = mocker.patch(mockpath)
         return request_mocks
 
 

@@ -31,7 +31,11 @@ async def next_page_patch(
             stripe_account=stripe_account,
         )
 
-    last_id = self.data[-1].id
+    last_id = getattr(self.data[-1], "id")
+    if not last_id:
+        raise ValueError(
+            "Unexpected: element in .data of list object had no id"
+        )
 
     params_with_filters = self._retrieve_params.copy()
     params_with_filters.update({"starting_after": last_id})
@@ -54,7 +58,11 @@ async def previous_page_patch(
             stripe_account=stripe_account,
         )
 
-    first_id = self.data[0].id
+    first_id = getattr(self.data[0], "id")
+    if not first_id:
+        raise ValueError(
+            "Unexpected: element in .data of list object had no id"
+        )
 
     params_with_filters = self._retrieve_params.copy()
     params_with_filters.update({"ending_before": first_id})
